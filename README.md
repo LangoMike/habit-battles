@@ -20,14 +20,40 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+# Habit Battles
 
-To learn more about Next.js, take a look at the following resources:
+Track your habits, keep daily streaks, and battle friends in time‑boxed challenges. Built with **Next.js + TypeScript**, **Supabase (Auth · Postgres · Realtime)**, **Tailwind CSS**, and **shadcn/ui**. Deployed on **Vercel**.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+> ⚠️ This is an MVP scaffold. It ships with auth, habits + check‑ins, and realtime updates. Friends/Battles pages are scaffolded and ready to implement.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔗 Demo
+- Live: https://YOUR-DEPLOYMENT-URL (replace after deploying)
+- Video/GIF: add a short screen capture of check‑ins
+
+## ✨ Features
+- 🔐 Passwordless **email magic link** auth (Supabase Auth)
+- ✅ **Create habits** (daily/custom schedule placeholder) and **one‑click check‑ins**
+- 🔥 **Realtime** UI updates via Supabase Postgres Change Feeds
+- 🔢 **Timezone‑aware streak** calculation utility
+- 🫂 **Friends & Battles** data model and pages (hook up leaderboard SQL next)
+- 🛡️ **Row Level Security (RLS)** policies so users only access their own data
+
+## 🧰 Tech Stack
+- **Frontend:** Next.js (App Router) + TypeScript, Tailwind, shadcn/ui
+- **Backend:** Supabase (Postgres, Auth, Realtime, Storage optional)
+- **Deployment:** Vercel (with optional Vercel Cron later)
+
+## 📦 Getting Started
+### Prerequisites
+- Node.js 18+
+- npm (or pnpm/yarn)
+- A Supabase project (https://supabase.com)
+
+### 1) Clone & install
+```bash
+git clone https://github.com/YOUR-USER/habit-battles.git
+cd habit-battles
+npm install
 
 ## Deploy on Vercel
 
