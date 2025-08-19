@@ -1,62 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
 # Habit Battles
 
-Track your habits, keep daily streaks, and battle friends in time‑boxed challenges. Built with **Next.js + TypeScript**, **Supabase (Auth · Postgres · Realtime)**, **Tailwind CSS**, and **shadcn/ui**. Deployed on **Vercel**.
+Habit Tracker Battles is a webapp designed to track personal habits, maintain weekly streaks, and (soon) compete with friends in consistancy based “battles.”  
+The main technologies used are **Next.js (TypeScript)**, **Supabase (Postgres · Auth · Realtime)**, **Tailwind CSS**, **shadcn/ui**, and **Sonner** for toast notifications. Deployed on **Vercel** (soon).
 
-> ⚠️ This is an MVP scaffold. It ships with auth, habits + check‑ins, and realtime updates. Friends/Battles pages are scaffolded and ready to implement.
+> **Status:** In progress. Developing UI
+MVP complete — authentication, habit CRUD, check-ins, weekly progress, and basic realtime updates. Friends/Battles, leaderboards, UI updates, and more features are on the roadmap.
 
-## 🔗 Demo
-- Live: https://YOUR-DEPLOYMENT-URL (replace after deploying)
-- Video/GIF: add a short screen capture of check‑ins
+---
 
-## ✨ Features
-- 🔐 Passwordless **email magic link** auth (Supabase Auth)
-- ✅ **Create habits** (daily/custom schedule placeholder) and **one‑click check‑ins**
-- 🔥 **Realtime** UI updates via Supabase Postgres Change Feeds
-- 🔢 **Timezone‑aware streak** calculation utility
-- 🫂 **Friends & Battles** data model and pages (hook up leaderboard SQL next)
-- 🛡️ **Row Level Security (RLS)** policies so users only access their own data
+## Table of Contents
+- [Purpose](#purpose)
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [System Architecture](#system-architecture)
+- [Data Model](#data-model)
+- [Security](#security)
+- [MVP Scope & Build Steps](#mvp-scope--build-steps)
 
-## 🧰 Tech Stack
-- **Frontend:** Next.js (App Router) + TypeScript, Tailwind, shadcn/ui
-- **Backend:** Supabase (Postgres, Auth, Realtime, Storage optional)
-- **Deployment:** Vercel (with optional Vercel Cron later)
+---
 
-## 📦 Getting Started
-### Prerequisites
-- Node.js 18+
-- npm (or pnpm/yarn)
-- A Supabase project (https://supabase.com)
+## Purpose
+Habit Battles is a small, production-leaning webapp designed to demonstrate:
+- End-to-end product thinking: from schema design and security to a polished UI.
+- Practical full-stack skills: authentication, CRUD, realtime updates, and simple analytics.
+- Clear engineering tradeoffs: an MVP that ships quickly, with a roadmap for scale.
 
-### 1) Clone & install
-```bash
-git clone https://github.com/YOUR-USER/habit-battles.git
-cd habit-battles
-npm install
+**User story:** as a user, I can create habits with a weekly target (e.g., “Exercise 4×/week”), log check-ins, and see progress for the current week. Social battles with friends are planned next.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Key Features
+- **Passwordless authentication** via email magic links (Supabase Auth).
+- **Habits CRUD**: create, edit, delete habits, each with a `target_per_week`.
+- **Check-ins**: one-click daily completion (per habit), stored per date.
+- **Weekly progress**: shows `completed_this_week / target_per_week`.
+- **Timezone awareness** for “today” and weekly windows.
+- **Realtime UI updates** using Supabase Postgres change feeds.
+- **Strong defaults**: Row Level Security (RLS), minimal permissions, environment separation.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Planned:
+- **Friends & Battles**: invite friends, join a battle, weekly leaderboard aggregation.
+- **Calendar heatmap**: visualize check-in history.
+- **Reminders/notifications** (email/push).
+
+---
+
+## Tech Stack
+**Frontend**
+- Next.js (App Router) + TypeScript
+- Tailwind CSS for utility-first styling
+- shadcn/ui components
+- Sonner for toast notifications
+
+**Backend**
+- Supabase: Postgres (managed), Auth, Realtime
+- RLS (Row Level Security) and policies in SQL
+
+**Tooling & Infra**
+- Vercel for hosting & CI
+- ESLint/TypeScript for code quality
+
+---
+
+## System Architecture
+- **Front-end** renders UI and calls Supabase via the JS client.  
+- **Supabase Auth** issues a session (JWT) used to authorize queries.
+- **Postgres + RLS** enforce per-user access at the database layer.
+- **Realtime** subscriptions refresh lists upon inserts/updates/deletes.
+
