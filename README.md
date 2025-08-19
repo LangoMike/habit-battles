@@ -13,8 +13,6 @@ MVP complete — authentication, habit CRUD, check-ins, weekly progress, and bas
 - [Key Features](#key-features)
 - [Tech Stack](#tech-stack)
 - [System Architecture](#system-architecture)
-- [Data Model](#data-model)
-- [Security](#security)
 - [MVP Scope & Build Steps](#mvp-scope--build-steps)
 
 ---
@@ -46,19 +44,23 @@ Planned:
 ---
 
 ## Tech Stack
-**Frontend**
-- Next.js (App Router) + TypeScript
-- Tailwind CSS for utility-first styling
-- shadcn/ui components
-- Sonner for toast notifications
 
-**Backend**
-- Supabase: Postgres (managed), Auth, Realtime
-- RLS (Row Level Security) and policies in SQL
+### Frontend (UI)
+- **React** — component-based UI for all pages/components.
+- **Next.js (App Router)** — routing, server rendering, server actions, and API routes on top of React.
+- **TypeScript** — end-to-end typing for safer, self-documenting code.
 
-**Tooling & Infra**
-- Vercel for hosting & CI
-- ESLint/TypeScript for code quality
+### Styling & Components
+- **Tailwind CSS** — utility-first styling for fast, consistent UI.
+- **shadcn/ui (Radix + Tailwind)** — accessible, headless components with a nice look.
+- **lucide-react** — icon set used in buttons, lists, and dialogs.
+
+### Data & Auth
+- **Supabase Postgres** — relational database for habits, check-ins, friends, and battles.
+- **Supabase Auth (email OTP “magic links”)** — passwordless sign-in.
+- **Supabase Realtime** — live UI updates via Postgres change feeds.
+- **Row Level Security (RLS)** — per-user data isolation directly in the DB.
+
 
 ---
 
