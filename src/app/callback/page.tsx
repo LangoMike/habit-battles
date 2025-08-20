@@ -22,17 +22,17 @@
 //   }, []);
 //   return <p>{msg}</p>;
 // }
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function CallbackPage() {
   const params = useSearchParams();
 
   useEffect(() => {
-    const code = params.get('code');
+    const code = params.get("code");
 
     // Newer magic-link flow: /callback?code=...
     if (code) {
@@ -41,15 +41,18 @@ export default function CallbackPage() {
           console.error(error);
           alert(error.message);
         } else {
-          window.location.replace('/dashboard');
+          window.location.replace("/dashboard");
         }
       });
       return;
     }
 
     // Fallback for older hash-based links: /callback#access_token=...
-    if (typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
-      window.location.replace('/dashboard');
+    if (
+      typeof window !== "undefined" &&
+      window.location.hash.includes("access_token")
+    ) {
+      window.location.replace("/dashboard");
     }
   }, [params]);
 
