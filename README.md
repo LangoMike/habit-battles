@@ -248,4 +248,4 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ---
 
-**Built with ❤️ using modern web technologies**
+**Created and designed by Mike Lango. Built using modern web technologies**
