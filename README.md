@@ -3,8 +3,12 @@
 Habit Tracker Battles is a webapp designed to track personal habits, maintain weekly streaks, and (soon) compete with friends in consistancy based “battles.”  
 The main technologies used are **Next.js (TypeScript)**, **Supabase (Postgres · Auth · Realtime)**, **Tailwind CSS**, **shadcn/ui**, and **Sonner** for toast notifications. Deployed on **Vercel** (soon).
 
-> **Status:** In progress. Developing UI
-MVP complete — authentication, habit CRUD, check-ins, weekly progress, and basic realtime updates. Friends/Battles, leaderboards, UI updates, and more features are on the roadmap.
+---
+
+> **Status:** 
+- **In progress**: Developing UI, Adding calender to view number of completed habits, adding
+- **MVP complete goal**: authentication, habit CRUD, check-ins, weekly progress, calender map, and basic realtime updates. 
+- **Planned Additional Feutures**: Friends/Battles, leaderboards, UI updates, and more features are on the roadmap.
 
 ---
 

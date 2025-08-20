@@ -50,7 +50,7 @@ export default function HabitList({ userId }: { userId: string }) {
           )}
         </div>
       ))}
-      {habits.length === 0 && <p className="opacity-70">No habits yet. Create one!</p>}
+      {habits.length === 0 && <p className="opacity-70">No habits yet... Start your jorney and create one!</p>}
     </div>
   );
 }
