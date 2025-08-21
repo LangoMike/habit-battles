@@ -262,8 +262,8 @@ export default function LoginPage() {
                     </div>
                   </div>
                   <p className="text-sm text-gray-300">
-                    "Habit Battles made building my morning routine fun.
-                    Competing with friends kept me motivated!"
+                    &quot;Habit Battles made building my morning routine fun.
+                    Competing with friends kept me motivated!&quot;
                   </p>
                 </div>
               </Card>
@@ -280,8 +280,8 @@ export default function LoginPage() {
                     </div>
                   </div>
                   <p className="text-sm text-gray-300">
-                    "Finally, a habit tracker that doesn't feel like a chore.
-                    The competitive aspect is genius!"
+                    &quot;Finally, a habit tracker that doesn&apos;t feel like a
+                    chore. The competitive aspect is genius!&quot;
                   </p>
                 </div>
               </Card>
