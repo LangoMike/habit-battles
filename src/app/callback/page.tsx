@@ -1,34 +1,10 @@
-// 'use client';
-// import { useEffect, useState } from 'react';
-// import { supabase } from '@/lib/supabaseClient';
-
-// export default function CallbackPage() {
-//   const [msg, setMsg] = useState('Signing you in...');
-//   useEffect(() => {
-//     const hash = window.location.hash; // for older flows
-//     const params = new URLSearchParams(window.location.search);
-//     const code = params.get('code');
-//     if (code) {
-//       supabase.auth.exchangeCodeForSession(code).then(({error}) => {
-//         if (error) setMsg(`Error: ${error.message}`);
-//         else window.location.href = '/dashboard';
-//       });
-//     } else if (hash.includes('access_token')) {
-//       // Fallback for token hash style
-//       window.location.href = '/dashboard';
-//     } else {
-//       setMsg('No auth code found.');
-//     }
-//   }, []);
-//   return <p>{msg}</p>;
-// }
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
-export default function CallbackPage() {
+function CallbackContent() {
   const params = useSearchParams();
 
   useEffect(() => {
@@ -57,4 +33,12 @@ export default function CallbackPage() {
   }, [params]);
 
   return <p style={{ padding: 16 }}>Signing you in…</p>;
+}
+
+export default function CallbackPage() {
+  return (
+    <Suspense fallback={<p style={{ padding: 16 }}>Loading...</p>}>
+      <CallbackContent />
+    </Suspense>
+  );
 }
