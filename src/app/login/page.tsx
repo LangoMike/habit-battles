@@ -139,7 +139,7 @@ export default function LoginPage() {
                         Check your email!
                       </p>
                       <p className="text-green-300 text-sm">
-                        We've sent you a magic link to sign in.
+                        We&apos;ve sent you a magic link to sign in.
                       </p>
                     </div>
                   </div>
