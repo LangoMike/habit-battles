@@ -200,7 +200,7 @@ export default function ProfilePage() {
                     <div className="flex items-start gap-2">
                       <span className="text-blue-400 font-medium">4.</span>
                       <span className="text-gray-300">
-                        Click "Save Profile" to update your avatar
+                        Click &quot;Save Profile&quot; to update your avatar
                       </span>
                     </div>
                   </div>

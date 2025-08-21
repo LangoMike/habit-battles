@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import MotivationalQuote from "@/components/MotivationalQuote";
 import StatsCards from "@/components/StatsCards";
 import { getQuotaStats, QuotaStats } from "@/lib/quotaTracker";
@@ -16,9 +14,7 @@ import { APP_SLOGAN } from "@/lib/constants";
 import Image from "next/image";
 
 export default function Dashboard() {
-  const [email, setEmail] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [stats, setStats] = useState<QuotaStats | null>(null);
   const [streakData, setStreakData] = useState<StreakData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,8 +25,6 @@ export default function Dashboard() {
         location.href = "/login";
         return;
       }
-      setEmail(data.user.email ?? null);
-      setUserId(data.user.id);
 
       // Fetch username from profiles table
       const { data: profile } = await supabase

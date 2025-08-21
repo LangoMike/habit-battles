@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getQuotaStats, QuotaStats } from "@/lib/quotaTracker";
 import { getStreakData, StreakData } from "@/lib/streak";
 import StreakDisplay from "@/components/StreakDisplay";
@@ -34,7 +34,7 @@ export default function CalendarPage() {
   const { startDate, endDate, days } = useMemo(() => {
     const start = new Date(currentDate);
     const end = new Date(currentDate);
-    let days: Date[] = [];
+    const days: Date[] = [];
 
     switch (viewMode) {
       case "week":
@@ -70,26 +70,7 @@ export default function CalendarPage() {
     return { startDate: start, endDate: end, days };
   }, [currentDate, viewMode]);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) return (location.href = "/login");
-      setUserId(data.user.id);
-      await fetchCheckins();
-      // Fetch stats and streak data
-      const [quotaStats, streakStats] = await Promise.all([
-        getQuotaStats(data.user.id),
-        getStreakData(data.user.id),
-      ]);
-      setStats(quotaStats);
-      setStreakData(streakStats);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (userId) fetchCheckins();
-  }, [userId, startDate, endDate]);
-
-  const fetchCheckins = async () => {
+  const fetchCheckins = useCallback(async () => {
     if (!userId) return;
     setLoading(true);
     const startISO = startDate.toISOString().split("T")[0];
@@ -141,7 +122,25 @@ export default function CalendarPage() {
       }))
     );
     setLoading(false);
-  };
+  }, [userId, startDate, endDate]);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return (location.href = "/login");
+      setUserId(data.user.id);
+      // Fetch stats and streak data
+      const [quotaStats, streakStats] = await Promise.all([
+        getQuotaStats(data.user.id),
+        getStreakData(data.user.id),
+      ]);
+      setStats(quotaStats);
+      setStreakData(streakStats);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (userId) fetchCheckins();
+  }, [userId, fetchCheckins]);
 
   const getCompletionCount = (date: Date) => {
     const dateStr = date.toISOString().split("T")[0];

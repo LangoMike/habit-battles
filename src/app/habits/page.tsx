@@ -3,12 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import CreateHabitDialog from "./CreateHabitDialog";
 import HabitList from "./HabitList";
-import { getStreakData, StreakData } from "@/lib/streak";
-import StreakDisplay from "@/components/StreakDisplay";
 
 export default function HabitsPage() {
   const [userId, setUserId] = useState<string | null>(null);
-  const [streakData, setStreakData] = useState<StreakData | null>(null);
   const tz = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
     []
@@ -19,8 +16,6 @@ export default function HabitsPage() {
       if (!data.user) location.href = "/login";
       else {
         setUserId(data.user.id);
-        const streakStats = await getStreakData(data.user.id);
-        setStreakData(streakStats);
       }
     });
   }, []);

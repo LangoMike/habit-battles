@@ -4,17 +4,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { APP_SLOGAN } from "@/lib/constants";
 import Image from "next/image";
 
 export default function NavBar() {
   const [username, setUsername] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
       if (data.user) {
-        setEmail(data.user.email ?? null);
         // Fetch username from profiles table
         const { data: profile } = await supabase
           .from("profiles")

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -9,7 +9,7 @@ type Habit = {
   id: string;
   name: string;
   target_per_week: number;
-  schedule: "daily" | any;
+  schedule: "daily" | "weekly" | "custom";
   created_at: string;
 };
 
@@ -29,56 +29,7 @@ export default function HabitList({ userId }: { userId: string }) {
     []
   );
 
-  useEffect(() => {
-    const t = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
-    const isoToday = new Date(
-      Date.UTC(t.getFullYear(), t.getMonth(), t.getDate())
-    )
-      .toISOString()
-      .slice(0, 10);
-    setToday(isoToday);
-
-    // Monday-start week
-    const jsDow = t.getDay(); // 0=Sun..6=Sat
-    const daysSinceMonday = (jsDow + 6) % 7; // Sun->6, Mon->0
-    const start = new Date(t);
-    start.setDate(t.getDate() - daysSinceMonday);
-    const end = new Date(start);
-    end.setDate(start.getDate() + 6);
-    const isoStart = new Date(
-      Date.UTC(start.getFullYear(), start.getMonth(), start.getDate())
-    )
-      .toISOString()
-      .slice(0, 10);
-    const isoEnd = new Date(
-      Date.UTC(end.getFullYear(), end.getMonth(), end.getDate())
-    )
-      .toISOString()
-      .slice(0, 10);
-    setWeekStart(isoStart);
-    setWeekEnd(isoEnd);
-
-    fetchData(isoStart, isoEnd, isoToday);
-
-    const ch = supabase
-      .channel("realtime:habits-checkins")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "habits" },
-        () => fetchData(isoStart, isoEnd, isoToday)
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "checkins" },
-        () => fetchData(isoStart, isoEnd, isoToday)
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(ch);
-    };
-  }, [tz]);
-
-  const fetchData = async (
+  const fetchData = useCallback(async (
     isoStart: string = weekStart,
     isoEnd: string = weekEnd,
     isoToday: string = today
@@ -134,7 +85,56 @@ export default function HabitList({ userId }: { userId: string }) {
     }));
     setHabits(withProgress);
     setLoading(false);
-  };
+  }, [userId, weekStart, weekEnd, today]);
+
+  useEffect(() => {
+    const t = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
+    const isoToday = new Date(
+      Date.UTC(t.getFullYear(), t.getMonth(), t.getDate())
+    )
+      .toISOString()
+      .slice(0, 10);
+    setToday(isoToday);
+
+    // Monday-start week
+    const jsDow = t.getDay(); // 0=Sun..6=Sat
+    const daysSinceMonday = (jsDow + 6) % 7; // Sun->6, Mon->0
+    const start = new Date(t);
+    start.setDate(t.getDate() - daysSinceMonday);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    const isoStart = new Date(
+      Date.UTC(start.getFullYear(), start.getMonth(), start.getDate())
+    )
+      .toISOString()
+      .slice(0, 10);
+    const isoEnd = new Date(
+      Date.UTC(end.getFullYear(), end.getMonth(), end.getDate())
+    )
+      .toISOString()
+      .slice(0, 10);
+    setWeekStart(isoStart);
+    setWeekEnd(isoEnd);
+
+    fetchData(isoStart, isoEnd, isoToday);
+
+    const ch = supabase
+      .channel("realtime:habits-checkins")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "habits" },
+        () => fetchData(isoStart, isoEnd, isoToday)
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "checkins" },
+        () => fetchData(isoStart, isoEnd, isoToday)
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [tz, fetchData]);
 
   const checkIn = async (habitId: string) => {
     const { error } = await supabase

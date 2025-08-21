@@ -45,7 +45,7 @@ export default function FriendsPage() {
       toast.error("User not found");
       return;
     }
-    const friendId = (target as any).id as string;
+    const friendId = target.id as string;
     if (friendId === userId) {
       toast.error("You cannot invite yourself");
       return;
