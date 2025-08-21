@@ -37,10 +37,13 @@ export async function getQuotaStats(userId: string): Promise<QuotaStats> {
     return {
       weeklyQuotasMet: 0,
       totalCheckins: 0,
-      totalHabits: habits?.length || 0,
+      totalHabits: 0,
       currentWeekProgress: []
     };
   }
+
+  // Ensure habits is an array
+  const habitsArray = habits || [];
 
   // Get checkins for this week
   const { data: weekCheckins, error: checkinsError } = await supabase
@@ -55,7 +58,7 @@ export async function getQuotaStats(userId: string): Promise<QuotaStats> {
     return {
       weeklyQuotasMet: 0,
       totalCheckins: 0,
-      totalHabits: habits?.length || 0,
+      totalHabits: habitsArray.length,
       currentWeekProgress: []
     };
   }
@@ -72,13 +75,13 @@ export async function getQuotaStats(userId: string): Promise<QuotaStats> {
 
   // Calculate weekly progress for each habit
   const habitProgress = new Map<string, number>();
-  weekCheckins?.forEach(checkin => {
+  (weekCheckins || []).forEach(checkin => {
     const count = habitProgress.get(checkin.habit_id) || 0;
     habitProgress.set(checkin.habit_id, count + 1);
   });
 
   let weeklyQuotasMet = 0;
-  const currentWeekProgress = habits?.map(habit => {
+  const currentWeekProgress = habitsArray.map(habit => {
     const completed = habitProgress.get(habit.id) || 0;
     const isMet = completed >= habit.target_per_week;
     if (isMet) weeklyQuotasMet++;
@@ -90,12 +93,12 @@ export async function getQuotaStats(userId: string): Promise<QuotaStats> {
       completed,
       isMet
     };
-  }) || [];
+  });
 
   return {
     weeklyQuotasMet,
-    totalCheckins: totalCheckins?.length || 0,
-    totalHabits: habits?.length || 0,
+    totalCheckins: (totalCheckins || []).length,
+    totalHabits: habitsArray.length,
     currentWeekProgress
   };
 }

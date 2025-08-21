@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { User, Mail, Image, Info, ExternalLink } from "lucide-react";
+import {
+  User,
+  Mail,
+  Image as ImageIcon,
+  Info,
+  ExternalLink,
+} from "lucide-react";
 
 type Profile = { username: string | null; avatar_url: string | null };
 
@@ -95,7 +101,7 @@ export default function ProfilePage() {
           {/* Avatar Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Image className="h-4 w-4 text-red-400" />
+              <ImageIcon className="h-4 w-4 text-red-400" />
               <span className="font-medium text-white">Profile Avatar</span>
             </div>
 
