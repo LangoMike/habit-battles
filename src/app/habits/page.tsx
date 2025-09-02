@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import CreateHabitDialog from "./CreateHabitDialog";
 import HabitList from "./HabitList";
+import PerformanceTester from "@/components/PerformanceTester";
 
 export default function HabitsPage() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -30,6 +31,10 @@ export default function HabitsPage() {
         </div>
 
         <HabitList userId={userId} />
+
+        <div className="border-t pt-8">
+          <PerformanceTester />
+        </div>
       </div>
     </div>
   );

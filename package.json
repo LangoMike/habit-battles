@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:performance": "node scripts/performance-test.js",
+    "test:performance:headless": "node scripts/performance-test.js --headless",
+    "setup:test-data": "node scripts/setup-test-data.js"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
@@ -32,6 +35,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
+    "puppeteer": "^24.18.0",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.7",
     "typescript": "^5"

@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import EditHabitDialog from "./EditHabitDialog";
+import { globalPerformanceTracker } from "@/lib/performanceMetrics";
 
 type Habit = {
   id: string;
@@ -29,63 +30,66 @@ export default function HabitList({ userId }: { userId: string }) {
     []
   );
 
-  const fetchData = useCallback(async (
-    isoStart: string = weekStart,
-    isoEnd: string = weekEnd,
-    isoToday: string = today
-  ) => {
-    setLoading(true);
-    const { data: habitsRows, error: habitsError } = await supabase
-      .from("habits")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: true });
-    if (habitsError) {
-      toast.error(habitsError.message);
-      setLoading(false);
-      return;
-    }
-    const ids = (habitsRows ?? []).map((h) => h.id);
-    if (ids.length === 0) {
-      setHabits([]);
-      setLoading(false);
-      return;
-    }
-    const { data: checkinsWeek, error: weekErr } = await supabase
-      .from("checkins")
-      .select("habit_id, checkin_date")
-      .eq("user_id", userId)
-      .in("habit_id", ids)
-      .gte("checkin_date", isoStart)
-      .lte("checkin_date", isoEnd);
-    if (weekErr) {
-      toast.error(weekErr.message);
-      setLoading(false);
-      return;
-    }
-    const { data: checkinsToday } = await supabase
-      .from("checkins")
-      .select("habit_id")
-      .eq("user_id", userId)
-      .in("habit_id", ids)
-      .eq("checkin_date", isoToday);
+  const fetchData = useCallback(
+    async (
+      isoStart: string = weekStart,
+      isoEnd: string = weekEnd,
+      isoToday: string = today
+    ) => {
+      setLoading(true);
+      const { data: habitsRows, error: habitsError } = await supabase
+        .from("habits")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: true });
+      if (habitsError) {
+        toast.error(habitsError.message);
+        setLoading(false);
+        return;
+      }
+      const ids = (habitsRows ?? []).map((h) => h.id);
+      if (ids.length === 0) {
+        setHabits([]);
+        setLoading(false);
+        return;
+      }
+      const { data: checkinsWeek, error: weekErr } = await supabase
+        .from("checkins")
+        .select("habit_id, checkin_date")
+        .eq("user_id", userId)
+        .in("habit_id", ids)
+        .gte("checkin_date", isoStart)
+        .lte("checkin_date", isoEnd);
+      if (weekErr) {
+        toast.error(weekErr.message);
+        setLoading(false);
+        return;
+      }
+      const { data: checkinsToday } = await supabase
+        .from("checkins")
+        .select("habit_id")
+        .eq("user_id", userId)
+        .in("habit_id", ids)
+        .eq("checkin_date", isoToday);
 
-    const doneTodaySet = new Set(
-      (checkinsToday ?? []).map((c) => c.habit_id as string)
-    );
-    const counts = new Map<string, number>();
-    (checkinsWeek ?? []).forEach((c) => {
-      const key = c.habit_id as string;
-      counts.set(key, (counts.get(key) ?? 0) + 1);
-    });
-    const withProgress: HabitWithProgress[] = (habitsRows ?? []).map((h) => ({
-      ...(h as Habit),
-      doneToday: doneTodaySet.has(h.id),
-      doneThisWeek: counts.get(h.id) ?? 0,
-    }));
-    setHabits(withProgress);
-    setLoading(false);
-  }, [userId, weekStart, weekEnd, today]);
+      const doneTodaySet = new Set(
+        (checkinsToday ?? []).map((c) => c.habit_id as string)
+      );
+      const counts = new Map<string, number>();
+      (checkinsWeek ?? []).forEach((c) => {
+        const key = c.habit_id as string;
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      });
+      const withProgress: HabitWithProgress[] = (habitsRows ?? []).map((h) => ({
+        ...(h as Habit),
+        doneToday: doneTodaySet.has(h.id),
+        doneThisWeek: counts.get(h.id) ?? 0,
+      }));
+      setHabits(withProgress);
+      setLoading(false);
+    },
+    [userId, weekStart, weekEnd, today]
+  );
 
   useEffect(() => {
     const t = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
@@ -137,6 +141,9 @@ export default function HabitList({ userId }: { userId: string }) {
   }, [tz, fetchData]);
 
   const checkIn = async (habitId: string) => {
+    // Start performance measurement
+    globalPerformanceTracker.startMeasurement();
+
     const { error } = await supabase
       .from("checkins")
       .insert({ habit_id: habitId, user_id: userId, checkin_date: today });
@@ -149,14 +156,24 @@ export default function HabitList({ userId }: { userId: string }) {
       } else {
         toast.error(error.message);
       }
+      // End measurement even on error
+      globalPerformanceTracker.endMeasurement();
     } else {
       toast.success("Checked in");
+      // End measurement after successful check-in
+      // The real-time subscription will trigger fetchData and update UI
+      // We'll end measurement when the UI actually updates
+      setTimeout(() => {
+        globalPerformanceTracker.endMeasurement();
+      }, 0);
     }
     await fetchData();
   };
 
   const deleteHabit = async (habitId: string) => {
-    const ok = confirm("Delete this habit? This will remove its check-ins.");
+    const ok = confirm(
+      "Delete this habit? This will remove its check-ins as well as remove it from the habit list."
+    );
     if (!ok) return;
     const { error } = await supabase.from("habits").delete().eq("id", habitId);
     if (error) toast.error(error.message);
@@ -205,7 +222,9 @@ export default function HabitList({ userId }: { userId: string }) {
         </div>
       ))}
       {!loading && habits.length === 0 && (
-        <p className="opacity-70">No habits yet… Create your first habit.</p>
+        <p className="opacity-70">
+          No habits yet… Create your first habit to start tracking!
+        </p>
       )}
     </div>
   );
