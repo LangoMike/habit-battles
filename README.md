@@ -371,13 +371,6 @@ This project demonstrates my**full-stack engineering progression** with:
 - **Production Ready**: Deployed on Vercel with comprehensive testing
 - **Social Features**: Complete friend and battle system
 - **Performance Analytics**: Built-in metrics and testing infrastructure
-
-**Perfect for demonstrating technical competency in interviews and showcasing modern web development skills.**
-
 ---
 
 **Built by Mike Lango**
-
-**Live Demo:** [habit-battles.vercel.app](https://habit-battles.vercel.app)  
-**GitHub:**  https://github.com/LangoMike/habit-battles
-**Main Technologies:** Next.js 15, React 19, TypeScript, Supabase, Tailwind CSS 4
