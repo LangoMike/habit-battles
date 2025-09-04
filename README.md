@@ -1,4 +1,4 @@
-# Habit Battles 🚀
+# Habit Battles
 
 **"Fight the old you. Build the new you."**
 
@@ -8,7 +8,7 @@ A production-ready, real-time habit tracking webapp that combines personal accou
 
 ---
 
-## 🎯 **Project Overview**
+## **Project Overview**
 
 Habit Battles demonstrates **full-stack engineering progression** with a focus on:
 - **Real-time performance**: 80ms median write→UI refresh with p95 < 200 ms
@@ -18,26 +18,26 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 
 ---
 
-## 📋 **Table of Contents**
+## **Table of Contents**
 
-- [🚀 **Live Demo & Status**](#-live-demo--status)
-- [✨ **Key Features**](#-key-features)
-- [🏗️ **Technical Architecture**](#️-technical-architecture)
-- [📊 **Performance Metrics**](#-performance-metrics)
-- [👥 **Social Features**](#-social-features)
-- [🔐 **Security & Authentication**](#-security--authentication)
-- [📱 **User Experience**](#-user-experience)
-- [🛠️ **Tech Stack**](#️-tech-stack)
-- [📁 **Project Structure**](#-project-structure)
-- [🚀 **Getting Started**](#-getting-started)
-- [📈 **Performance Testing**](#-performance-testing)
-- [🗄️ **Database Schema**](#️-database-schema)
-- [📋 **Development Roadmap**](#-development-roadmap)
-- [🎯 **Technical Highlights**](#-technical-highlights)
+- [ **Live Demo & Status**](#-live-demo--status)
+- [ **Key Features**](#-key-features)
+- [ **Technical Architecture**](#️-technical-architecture)
+- [ **Performance Metrics**](#-performance-metrics)
+- [ **Social Features**](#-social-features)
+- [ **Security & Authentication**](#-security--authentication)
+- [ **User Experience**](#-user-experience)
+- [ **Tech Stack**](#️-tech-stack)
+- [ **Project Structure**](#-project-structure)
+- [ **Getting Started**](#-getting-started)
+- [ **Performance Testing**](#-performance-testing)
+- [ **Database Schema**](#️-database-schema)
+- [ **Development Roadmap**](#-development-roadmap)
+- [ **Technical Highlights**](#-technical-highlights)
 
 ---
 
-## 🚀 **Live Demo & Status**
+##  **Live Demo & Status**
 
 - **✅ Production Deployed**: [habit-battles.vercel.app](https://habit-battles.vercel.app)
 - **✅ Core Features Complete**: Authentication, habits, check-ins, streaks, calendar
@@ -47,27 +47,27 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 
 ---
 
-## ✨ **Key Features**
+## **Key Features**
 
-### 🔥 **Habit Management & Tracking**
+### **Habit Management & Tracking**
 - **Smart CRUD Operations**: Create, edit, delete habits with weekly targets (1-7x/week)
 - **One-Click Check-ins**: Daily completion with duplicate prevention and real-time updates
 - **Progress Visualization**: Weekly quotas, completion rates, and trend analysis
 - **Target Validation**: Intelligent defaults and constraint enforcement
 
-### 👥 **Social Competition System**
+### **Social Competition System**
 - **Friend Management**: Send/accept friend requests, manage connections
 - **Weekly Battles**: Create and join competitive challenges with custom rules (coming soon)
 - **Real-time Leaderboards**: Live rankings updated via Supabase change feeds
 - **Battle Results**: Automatic scoring, winner determination, and notifications
 
-### 📊 **Advanced Analytics & Insights**
+### **Advanced Analytics & Insights**
 - **Interactive Calendar**: Heatmap visualization with week/month/year views
 - **Streak Tracking**: Daily and weekly consecutive completion tracking
 - **Performance Metrics**: Built-in performance testing for write→UI refresh times
 - **Progress Statistics**: Comprehensive completion rates and trend analysis
 
-### 🔐 **Enterprise-Grade Security**
+### **Enterprise-Grade Security**
 - **Passwordless Authentication**: Email magic links via Supabase Auth
 - **Row Level Security (RLS)**: Database-level user data isolation
 - **JWT Session Management**: Secure, stateless authentication
@@ -75,7 +75,7 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 
 ---
 
-## 🏗️ **Technical Architecture**
+## **Technical Architecture**
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -99,13 +99,13 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 
 ---
 
-## 📊 **Performance Metrics**
+## **Performance Metrics**
 
 ### **Real-time Performance Achievements**
-- **✅ Median Write→UI Refresh**: < 80ms (target achieved)
-- **✅ P95 Performance**: < 200ms (target achieved)
-- **✅ Real-time Updates**: Supabase Postgres change feed subscriptions
-- **✅ Optimized Queries**: Efficient database operations with proper indexing
+- **Median Write→UI Refresh**: < 80ms (target achieved)
+- **P95 Performance**: < 200ms (target achieved)
+- **Real-time Updates**: Supabase Postgres change feed subscriptions
+- **Optimized Queries**: Efficient database operations with proper indexing
 
 ### **Performance Testing Infrastructure**
 - **Built-in Metrics Tracker**: Real-time performance monitoring during user interactions
@@ -121,7 +121,7 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 
 ---
 
-## 👥 **Social Features**
+## **Social Features**
 
 ### **Friend System**
 - **Friend Requests**: Send and accept connection invitations
@@ -142,7 +142,7 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 
 ---
 
-## 🔐 **Security & Authentication**
+## **Security & Authentication**
 
 ### **Authentication System**
 - **Passwordless Login**: Secure email magic links via Supabase Auth
@@ -157,7 +157,7 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 
 ---
 
-## 📱 **User Experience**
+## **User Experience**
 
 ### **Modern UI/UX Design**
 - **Dark Theme**: Motivational design with red/white accents
@@ -173,7 +173,7 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 
 ---
 
-## 🛠️ **Tech Stack**
+## **Tech Stack**
 
 ### **Frontend Framework**
 - **Next.js 15**: Latest App Router with server-side rendering
@@ -200,68 +200,6 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 
 ---
 
-## 📁 **Project Structure**
-
-```
-habit-battles/
-├── src/
-│   ├── app/                    # Next.js App Router pages
-│   │   ├── battles/           # Battle system pages
-│   │   ├── calendar/          # Calendar analytics
-│   │   ├── dashboard/         # Main dashboard
-│   │   ├── friends/           # Friend management
-│   │   ├── habits/            # Habit CRUD operations
-│   │   ├── profile/           # User profile management
-│   │   └── login/             # Authentication
-│   ├── components/            # Reusable UI components
-│   │   ├── ui/               # shadcn/ui components
-│   │   ├── PerformanceTester # Performance metrics
-│   │   └── navBar.tsx        # Navigation component
-│   └── lib/                  # Utility libraries
-│       ├── supabaseClient.ts # Supabase configuration
-│       ├── performanceMetrics.ts # Performance tracking
-│       └── auth.ts           # Authentication utilities
-├── scripts/                   # Performance testing scripts
-├── public/                    # Static assets
-└── docs/                     # Project documentation
-```
-
----
-
-## 🚀 **Getting Started**
-
-### **Prerequisites**
-- Node.js 18+ 
-- npm or yarn
-- Supabase account
-
-### **Quick Start**
-```bash
-# Clone and setup
-git clone <repository-url>
-cd habit-battles
-npm install
-
-# Environment configuration
-cp .env.local.example .env.local
-# Add your Supabase credentials
-
-# Development
-npm run dev
-
-# Performance testing
-npm run test:performance
-```
-
-### **Environment Variables**
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-```
-
----
-
 ## 📈 **Performance Testing**
 
 ### **Built-in Performance Tracker**
@@ -278,7 +216,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 ---
 
-## 🗄️ **Database Schema**
+## **Database Schema**
 
 ### **Core Tables**
 ```sql
@@ -310,7 +248,7 @@ battle_members (id, battle_id, user_id, score, completed_habits, created_at)
 
 ---
 
-## 📋 **Development Roadmap**
+## **Development Roadmap**
 
 ### **Phase 1: Core MVP ✅ COMPLETE**
 - [x] Authentication system with Supabase Auth
@@ -333,7 +271,7 @@ battle_members (id, battle_id, user_id, score, completed_habits, created_at)
 
 
 
-### **Phase 4: Advanced Features 🚧 IN PROGRESS**
+### **Phase 4: Advanced Features IN PROGRESS**
 - [ ] Push notifications and email reminders
 - [ ] Advanced analytics and trend analysis
 - [ ] Mobile app development
@@ -341,7 +279,7 @@ battle_members (id, battle_id, user_id, score, completed_habits, created_at)
 
 ---
 
-## 🎯 **Technical Highlights**
+## **Technical Highlights**
 
 ### **Real-time Architecture**
 - **Supabase Change Feeds**: Postgres triggers → WebSocket notifications → UI updates
@@ -362,15 +300,15 @@ battle_members (id, battle_id, user_id, score, completed_habits, created_at)
 
 ---
 
-## 🏆 **Project Impact**
+## **Project Impact**
 
-This project demonstrates my**full-stack engineering progression** with:
-- **Real-time Performance**: Sub-80ms median response times
-- **Scalable Architecture**: Supabase + PostgreSQL with RLS
-- **Modern Development**: Next.js 15, React 19, TypeScript
-- **Production Ready**: Deployed on Vercel with comprehensive testing
-- **Social Features**: Complete friend and battle system
-- **Performance Analytics**: Built-in metrics and testing infrastructure
+As a kid, I was obsessed with building. Legos, forts, K’Nex, even Scratch games, you name it, my hand were probably on it. I remember never knowing exactly how things would turn out, but that uncertainty and hands-on learning was what made it exciting. That same drive is why I chose computer science: to build.
+
+By the time I worked through courses in OOP, DSA, math, math, math, and the fundamentals, I learned the technical base. I could implement a quadtree in Java, build web pages with HTML/CSS, use Git, and design SQL tables. But I still didn’t know how to put it all together into something real. That gap gave me serious imposter syndrome. I knew I had the skills, but without actually building something end-to-end, it didn’t feel like I did.
+
+This project changed that. I started with zero knowledge of the tech stack, no clue how to structure a full application, and just began. Step by step, I learned the tools, solved problems, and saw it come together. It wasn’t always smooth (looking at you, ESLint), but it was fun and rewarding in a way that reminded me why I started coding in the first place.
+
+Finishing this project gave me back that spark I had before diff eq. Now I know I can take an idea, figure it out, and make it real. Excited to see what the future holds.. Onto the next project :)
 ---
 
 **Built by Mike Lango**
