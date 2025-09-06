@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, Suspense, useState } from "react";
+import { useEffect, Suspense, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -13,20 +13,20 @@ function CallbackContent() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [retryCount, setRetryCount] = useState(0);
 
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = useCallback(() => {
     console.log("✅ Authentication successful, redirecting to dashboard");
     setStatus("success");
     // Use Next.js router instead of window.location for better mobile compatibility
     router.push("/dashboard");
-  };
+  }, [router]);
 
-  const handleAuthError = (error: any) => {
+  const handleAuthError = useCallback((error: Error | { message: string }) => {
     console.error("❌ Authentication failed:", error);
     setStatus("error");
     setErrorMessage(
       error.message || "Authentication failed. Please try again."
     );
-  };
+  }, []);
 
   const retryAuth = () => {
     console.log("🔄 Retrying authentication...");
@@ -107,7 +107,7 @@ function CallbackContent() {
     setTimeout(() => {
       router.push("/login");
     }, 2000);
-  }, [params, router, retryCount]);
+  }, [params, router, retryCount, handleAuthSuccess, handleAuthError]);
 
   if (status === "loading") {
     return (
