@@ -23,18 +23,16 @@ export default function HabitsPage() {
 
   if (!userId) return null;
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
-      <div className="container mx-auto px-4 py-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-white">Your Habits</h1>
-          <CreateHabitDialog userId={userId} tz={tz} />
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 p-4 p-8 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border border-gray-700/50 rounded-xl space-y-6 min-h-[calc(100vh-4rem)]">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-white">Your Habits</h1>
+        <CreateHabitDialog userId={userId} tz={tz} />
+      </div>
 
-        <HabitList userId={userId} />
+      <HabitList userId={userId} />
 
-        <div className="border-t pt-8">
-          <PerformanceTester />
-        </div>
+      <div className="border-t pt-8">
+        <PerformanceTester />
       </div>
     </div>
   );
