@@ -58,6 +58,11 @@ export default function NavBar() {
           </span>
         </Link>
 
+        {/* Mobile Center Title */}
+        <div className="md:hidden">
+          <h1 className="font-semibold text-white text-lg">Habit Battles</h1>
+        </div>
+
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center">
           <Link
