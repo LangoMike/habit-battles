@@ -30,15 +30,30 @@ export default function LoginPage() {
     setErr(null);
     setLoading(true);
 
+    const redirectUrl = `${location.origin}/callback`;
+
+    console.log("📧 Sending magic link:", {
+      email,
+      redirectUrl,
+      userAgent: navigator.userAgent,
+      isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent),
+    });
+
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${location.origin}/callback` },
+      options: {
+        emailRedirectTo: redirectUrl,
+        // Add additional options for better mobile compatibility
+        shouldCreateUser: true,
+      },
     });
 
     if (error) {
+      console.error("❌ Magic link send failed:", error);
       setErr(error.message);
       toast.error(error.message);
     } else {
+      console.log("✅ Magic link sent successfully");
       setSent(true);
       toast.success("Magic link sent! Check your email.");
     }
@@ -137,6 +152,10 @@ export default function LoginPage() {
                     </p>
                     <p className="text-green-300 text-sm">
                       We&apos;ve sent you a magic link to sign in.
+                    </p>
+                    <p className="text-green-300 text-xs mt-1">
+                      📱 On mobile: Make sure to open the link in the same
+                      browser you&apos;re using now.
                     </p>
                   </div>
                 </div>
