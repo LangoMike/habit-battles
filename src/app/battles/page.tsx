@@ -16,14 +16,15 @@ import { getQuotaStats, QuotaStats } from "@/lib/quotaTracker";
 import { getStreakData, StreakData } from "@/lib/streak";
 import StreakDisplay from "@/components/StreakDisplay";
 
-type viewMode = "week"| "month" | "year";
-
+type viewMode = "week" | "month" | "year";
 
 export default function BattlesPage() {
   return (
     <div className="space-y-2">
       <h1 className="text-xl font-semibold">Battles</h1>
-      <p>Coming soon: create battles, invite friends, and leaderboards.</p>
+      <p>
+        Coming soon: create battles and fight to the top of the leaderboards.
+      </p>
     </div>
   );
 }
