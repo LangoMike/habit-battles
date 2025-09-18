@@ -38,11 +38,11 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 
 ##  **Live Demo & Status**
 
-- ** Production Deployed**: [habit-battles.vercel.app](https://habit-battles.vercel.app)
-- ** Core Features Complete**: Authentication, habits, check-ins, streaks, calendar
-- ** Social System Live**: Friends, battles, leaderboards, real-time updates
-- ** Performance Optimized**: Real-time UX with sub-220ms median response
-- ** Ready for Scale**: Database optimized, RLS secured, edge deployed
+- **Production Deployed**: [habit-battles.vercel.app](https://habit-battles.vercel.app)
+- **Core Features Complete**: Authentication, habits, check-ins, streaks, calendar
+- **Social System Live**: Friends, battles, leaderboards, real-time updates
+- **Performance Optimized**: Real-time UX with sub-220ms median response
+- **Ready for Scale**: Database optimized, RLS secured, edge deployed
 
 ---
 
