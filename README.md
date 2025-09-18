@@ -22,20 +22,17 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 
 - [ **Live Demo & Status**](#-live-demo-&-status)
 - [ **Key Features**](#-key-features)
-- [ **Social Competition System**](#-social-competition-system)
-- [**Advanced Analytics & Insights**](#-advanced-analytics-&-insights)
 - [ **Technical Architecture**](#️-technical-architecture)
 - [ **Performance Metrics**](#-performance-metrics)
 - [ **Social Features**](#-social-features)
 - [ **Security & Authentication**](#-security--authentication)
 - [ **User Experience**](#-user-experience)
 - [ **Tech Stack**](#️-tech-stack)
-- [ **Project Structure**](#-project-structure)
-- [ **Getting Started**](#-getting-started)
 - [ **Performance Testing**](#-performance-testing)
 - [ **Database Schema**](#️-database-schema)
 - [ **Development Roadmap**](#-development-roadmap)
 - [ **Technical Highlights**](#-technical-highlights)
+- [** Project Impact**](#-project-impact)
 
 ---
 
