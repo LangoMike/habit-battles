@@ -32,7 +32,7 @@ Habit Battles demonstrates **full-stack engineering progression** with a focus o
 - [ **Database Schema**](#️-database-schema)
 - [ **Development Roadmap**](#-development-roadmap)
 - [ **Technical Highlights**](#-technical-highlights)
-- [** Project Impact**](#-project-impact)
+- [**Project Impact**](#-project-impact)
 
 ---
 
