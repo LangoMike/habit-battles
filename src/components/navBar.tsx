@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -10,10 +11,13 @@ import Image from "next/image";
 
 export default function NavBar() {
   const [username, setUsername] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
       if (data.user) {
+        setIsAuthenticated(true);
         // Fetch username from profiles table
         const { data: profile } = await supabase
           .from("profiles")
@@ -37,6 +41,9 @@ export default function NavBar() {
             avatar_url: null,
           });
         }
+      } else {
+        setIsAuthenticated(false);
+        setUsername(null);
       }
     });
   }, []);
@@ -63,8 +70,9 @@ export default function NavBar() {
           <h1 className="font-semibold text-white text-lg">Habit Battles</h1>
         </div>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center">
+        {/* Desktop Navigation - Hide on login pages when not authenticated */}
+        {isAuthenticated && !pathname?.includes('/login') && (
+          <div className="hidden md:flex items-center">
           <Link
             href="/habits"
             className="text-base font-medium text-white opacity-80 hover:opacity-100 transition-opacity px-3 py-2 rounded hover:bg-white/5"
@@ -99,12 +107,14 @@ export default function NavBar() {
           >
             Profile
           </Link>
-        </div>
+          </div>
+        )}
 
         {/* Right Side - User Info & Mobile Menu */}
         <div className="flex items-center gap-3">
-          {/* Mobile Menu */}
-          <div className="md:hidden">
+          {/* Mobile Menu - Hide on login pages when not authenticated */}
+          {isAuthenticated && !pathname?.includes('/login') && (
+            <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm" className="p-2">
@@ -149,7 +159,8 @@ export default function NavBar() {
                 </div>
               </SheetContent>
             </Sheet>
-          </div>
+            </div>
+          )}
 
           {/* User Info */}
           {username ? (
@@ -175,7 +186,7 @@ export default function NavBar() {
             </>
           ) : (
             <Button size="sm" asChild>
-              <Link href="/login">Login</Link>
+              <Link href="/loginOptions">Login</Link>
             </Button>
           )}
         </div>
