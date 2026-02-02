@@ -249,14 +249,14 @@ battle_members (id, battle_id, user_id, score, completed_habits, created_at)
 
 ## **Development Roadmap**
 
-### **Phase 1: Core MVP ✅ COMPLETE**
+### **Phase 1: Core MVP  COMPLETE**
 - [x] Authentication system with Supabase Auth
 - [x] Habit CRUD operations and daily check-ins
 - [x] Streak tracking and progress visualization
 - [x] Calendar heatmap with analytics
 - [x] User profiles and customization
 
-### **Phase 2: Performance & Analytics ✅ COMPLETE**
+### **Phase 2: Performance & Analytics  COMPLETE**
 - [x] Real-time performance metrics
 - [x] Built-in performance testing
 - [x] Automated testing suite

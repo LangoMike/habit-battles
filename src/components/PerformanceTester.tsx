@@ -119,10 +119,10 @@ export default function PerformanceTester() {
                 <strong>Target:</strong> Median &lt; 220ms, P95 &lt; 1000ms
               </div>
               <div className="text-sm mt-1">
-                {metrics.median < 220 ? "✅" : "❌"} Median:{" "}
+                {metrics.median < 220 ? "" : ""} Median:{" "}
                 {metrics.median < 220 ? "PASS" : "FAIL"}
                 {" | "}
-                {metrics.p95 < 1000 ? "✅" : "❌"} P95:{" "}
+                {metrics.p95 < 1000 ? "" : ""} P95:{" "}
                 {metrics.p95 < 1000 ? "PASS" : "FAIL"}
               </div>
             </div>

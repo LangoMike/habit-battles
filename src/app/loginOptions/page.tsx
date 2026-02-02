@@ -22,7 +22,7 @@ export default function LoginOptionsPage() {
     setLoading(true);
     
     const redirectUrl = `${location.origin}/callback`;
-    console.log("📧 Sending magic link:", {
+    console.log("Sending magic link:", {
       email,
       redirectUrl,
       userAgent: navigator.userAgent,
@@ -38,11 +38,11 @@ export default function LoginOptionsPage() {
     });
     
     if (error) {
-      console.error("❌ Magic link send failed:", error);
+      console.error("Magic link send failed:", error);
       setErr(error.message);
       toast.error(error.message);
     } else {
-      console.log("✅ Magic link sent successfully");
+      console.log("Magic link sent successfully");
       setSent(true);
       toast.success("Magic link sent! Check your email.");
     }
@@ -59,7 +59,7 @@ export default function LoginOptionsPage() {
     });
     
     if (error) {
-      console.error("❌ Google sign-in failed:", error);
+      console.error("Google sign-in failed:", error);
       toast.error(error.message);
       setLoading(false);
     }
@@ -75,14 +75,14 @@ export default function LoginOptionsPage() {
     });
     
     if (error) {
-      console.error("❌ GitHub sign-in failed:", error);
+      console.error(" GitHub sign-in failed:", error);
       toast.error(error.message);
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-xl p-4">
       <div className="p-8 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border border-gray-700/50 rounded-xl space-y-8 min-h-[calc(100vh-4rem)]">
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Left Column - Branding */}

@@ -67,7 +67,7 @@ class PerformanceTestRunner {
     await checkInButton.click();
     
     // Wait for UI update (check mark appears)
-    await page.waitForSelector('text=✅ Today', { timeout: 5000 });
+    await page.waitForSelector('text= Today', { timeout: 5000 });
     
     const endTime = Date.now();
     const duration = endTime - startTime;
@@ -116,13 +116,13 @@ class PerformanceTestRunner {
       
       this.results.push(result);
       
-      console.log(`  ✅ Test completed:`);
+      console.log(`   Test completed:`);
       console.log(`     Median: ${median}ms`);
       console.log(`     P95: ${p95}ms`);
       console.log(`     Mean: ${mean.toFixed(1)}ms`);
       
     } catch (error) {
-      console.error(`  ❌ Test failed: ${error.message}`);
+      console.error(`   Test failed: ${error.message}`);
     }
   }
 
@@ -157,14 +157,14 @@ class PerformanceTestRunner {
   }
 
   generateReport() {
-    console.log('\n📊 PERFORMANCE TEST REPORT');
+    console.log('\n PERFORMANCE TEST REPORT');
     console.log('=' .repeat(50));
     
     this.results.forEach(result => {
       console.log(`\n${result.testName}:`);
       console.log(`  Measurements: ${result.count}`);
-      console.log(`  Median: ${result.median}ms ${result.median < 220 ? '✅' : '❌'} (target: <220ms)`);
-      console.log(`  P95: ${result.p95}ms ${result.p95 < 1000 ? '✅' : '❌'} (target: <1000ms)`);
+      console.log(`  Median: ${result.median}ms ${result.median < 220 ? '' : ''} (target: <220ms)`);
+      console.log(`  P95: ${result.p95}ms ${result.p95 < 1000 ? '' : ''} (target: <1000ms)`);
       console.log(`  Mean: ${result.mean.toFixed(1)}ms`);
       console.log(`  Range: ${result.min}ms - ${result.max}ms`);
     });
@@ -174,10 +174,10 @@ class PerformanceTestRunner {
     const overallMedian = allMeasurements.sort((a, b) => a - b)[Math.floor(allMeasurements.length / 2)];
     const overallP95 = allMeasurements.sort((a, b) => a - b)[Math.floor(allMeasurements.length * 0.95)];
     
-    console.log('\n🎯 OVERALL SUMMARY:');
+    console.log('\n OVERALL SUMMARY:');
     console.log(`  Total Measurements: ${allMeasurements.length}`);
-    console.log(`  Overall Median: ${overallMedian}ms ${overallMedian < 220 ? '✅' : '❌'}`);
-    console.log(`  Overall P95: ${overallP95}ms ${overallP95 < 1000 ? '✅' : '❌'}`);
+    console.log(`  Overall Median: ${overallMedian}ms ${overallMedian < 220 ? '' : ''}`);
+    console.log(`  Overall P95: ${overallP95}ms ${overallP95 < 1000 ? '' : ''}`);
     
     // Save detailed results
     const reportData = {
@@ -191,7 +191,7 @@ class PerformanceTestRunner {
     };
     
     fs.writeFileSync('performance-test-results.json', JSON.stringify(reportData, null, 2));
-    console.log('\n📁 Detailed results saved to: performance-test-results.json');
+    console.log('\n Detailed results saved to: performance-test-results.json');
   }
 
   async cleanup() {

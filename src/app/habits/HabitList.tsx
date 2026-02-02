@@ -197,7 +197,7 @@ export default function HabitList({ userId }: { userId: string }) {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {h.doneToday ? (
-              <span className="text-sm">✅ Today</span>
+              <span className="text-sm"> Today</span>
             ) : (
               <Button size="sm" onClick={() => checkIn(h.id)}>
                 Check in

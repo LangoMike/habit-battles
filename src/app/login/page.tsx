@@ -16,7 +16,7 @@ import Image from "next/image";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-xl p-4">
       <div className="p-8 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border border-gray-700/50 rounded-xl space-y-8 min-h-[calc(100vh-4rem)]">
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Left Column - Branding */}

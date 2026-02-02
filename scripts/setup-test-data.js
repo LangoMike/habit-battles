@@ -7,7 +7,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('❌ Missing required environment variables:');
+  console.error(' Missing required environment variables:');
   console.error('   NEXT_PUBLIC_SUPABASE_URL');
   console.error('   SUPABASE_SERVICE_ROLE_KEY');
   console.error('\nPlease add these to your .env.local file');
@@ -17,7 +17,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function setupTestData() {
-  console.log('🚀 Setting up test data for performance testing...\n');
+  console.log(' Setting up test data for performance testing...\n');
 
   try {
     // Create test users
@@ -32,7 +32,7 @@ async function setupTestData() {
     if (user1Error) {
       console.log('   User 1 already exists or error:', user1Error.message);
     } else {
-      console.log('   ✅ Created testuser1@example.com');
+      console.log('    Created testuser1@example.com');
     }
 
     const { data: user2, error: user2Error } = await supabase.auth.admin.createUser({
@@ -44,7 +44,7 @@ async function setupTestData() {
     if (user2Error) {
       console.log('   User 2 already exists or error:', user2Error.message);
     } else {
-      console.log('   ✅ Created testuser2@example.com');
+      console.log('    Created testuser2@example.com');
     }
 
     // Get user IDs
@@ -53,7 +53,7 @@ async function setupTestData() {
     const testUser2 = users.users.find(u => u.email === 'testuser2@example.com');
 
     if (!testUser1 || !testUser2) {
-      console.error('❌ Could not find test users');
+      console.error(' Could not find test users');
       return;
     }
 
@@ -72,7 +72,7 @@ async function setupTestData() {
         avatar_url: null
       }
     ]);
-    console.log('   ✅ Created user profiles');
+    console.log('    Created user profiles');
 
     // Create test habits
     console.log('\n3. Creating test habits...');
@@ -116,9 +116,9 @@ async function setupTestData() {
       .select();
 
     if (habitsError) {
-      console.error('   ❌ Error creating habits:', habitsError.message);
+      console.error('    Error creating habits:', habitsError.message);
     } else {
-      console.log(`   ✅ Created ${createdHabits.length} test habits`);
+      console.log(`    Created ${createdHabits.length} test habits`);
     }
 
     // Create some initial check-ins for testing
@@ -160,9 +160,9 @@ async function setupTestData() {
         .select();
 
       if (checkinsError) {
-        console.error('   ❌ Error creating check-ins:', checkinsError.message);
+        console.error('    Error creating check-ins:', checkinsError.message);
       } else {
-        console.log(`   ✅ Created ${createdCheckins.length} initial check-ins`);
+        console.log(`    Created ${createdCheckins.length} initial check-ins`);
       }
     }
 
@@ -170,11 +170,11 @@ async function setupTestData() {
     console.log('\n📋 Test Accounts:');
     console.log('   User 1: testuser1@example.com / password123');
     console.log('   User 2: testuser2@example.com / password123');
-    console.log('\n🚀 You can now run performance tests:');
+    console.log('\n You can now run performance tests:');
     console.log('   npm run test:performance');
 
   } catch (error) {
-    console.error('❌ Setup failed:', error.message);
+    console.error(' Setup failed:', error.message);
     console.error(error);
   }
 }

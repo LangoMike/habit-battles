@@ -88,7 +88,7 @@ function CallbackContent() {
             handleAuthError(error);
           } else if (data.session) {
             console.log(
-              "✅ Hash-based session found:",
+              " Hash-based session found:",
               data.session.user?.email
             );
             handleAuthSuccess();
