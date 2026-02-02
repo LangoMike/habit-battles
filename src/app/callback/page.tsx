@@ -14,14 +14,14 @@ function CallbackContent() {
   const [retryCount, setRetryCount] = useState(0);
 
   const handleAuthSuccess = useCallback(() => {
-    console.log("✅ Authentication successful, redirecting to dashboard");
+    console.log("Authentication successful, redirecting to dashboard");
     setStatus("success");
     // Use Next.js router instead of window.location for better mobile compatibility
     router.push("/dashboard");
   }, [router]);
 
   const handleAuthError = useCallback((error: Error | { message: string }) => {
-    console.error("❌ Authentication failed:", error);
+    console.error("Authentication failed:", error);
     setStatus("error");
     setErrorMessage(
       error.message || "Authentication failed. Please try again."
@@ -29,7 +29,7 @@ function CallbackContent() {
   }, []);
 
   const retryAuth = () => {
-    console.log("🔄 Retrying authentication...");
+    console.log("Retrying authentication...");
     setStatus("loading");
     setRetryCount((prev) => prev + 1);
 
@@ -51,7 +51,7 @@ function CallbackContent() {
 
     // Newer magic-link flow: /callback?code=...
     if (code) {
-      console.log("📧 Processing magic link with code...");
+      console.log(" Processing magic link with code...");
 
       supabase.auth
         .exchangeCodeForSession(code)
@@ -60,7 +60,7 @@ function CallbackContent() {
             handleAuthError(error);
           } else if (data.session) {
             console.log(
-              "✅ Session created successfully:",
+              " Session created successfully:",
               data.session.user?.email
             );
             handleAuthSuccess();
@@ -103,7 +103,7 @@ function CallbackContent() {
     }
 
     // No auth parameters found
-    console.log("⚠️ No authentication parameters found, redirecting to login");
+    console.log(" No authentication parameters found, redirecting to login");
     setTimeout(() => {
       router.push("/login");
     }, 2000);
@@ -111,7 +111,7 @@ function CallbackContent() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center rounded-xl">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
           <p className="text-white text-lg">Signing you in...</p>
@@ -125,7 +125,7 @@ function CallbackContent() {
 
   if (status === "success") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center rounded-xl">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
             <span className="text-white text-2xl">✓</span>
@@ -141,7 +141,7 @@ function CallbackContent() {
 
   if (status === "error") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center rounded-xl p-4">
         <div className="max-w-md w-full bg-gradient-to-r from-gray-900/50 to-gray-800/50 border border-gray-700/50 rounded-xl p-8 text-center space-y-6">
           <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto">
             <span className="text-white text-2xl">!</span>
