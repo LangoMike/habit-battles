@@ -8,6 +8,15 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Search, UserPlus, Users, Check, X, Sword } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { createBattle } from "@/lib/battleUtils";
 
 type FriendRow = {
   id: string;
@@ -25,18 +34,34 @@ type Profile = {
 
 export default function FriendsPage() {
   const [userId, setUserId] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
   const [usernameToInvite, setUsernameToInvite] = useState("");
   const [friends, setFriends] = useState<FriendRow[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [friendUsernames, setFriendUsernames] = useState<Record<string, string>>({});
   const [friendAvatars, setFriendAvatars] = useState<Record<string, string | null>>({});
   const [loading, setLoading] = useState(false);
+  const [battleDialogOpen, setBattleDialogOpen] = useState(false);
+  const [selectedFriendForBattle, setSelectedFriendForBattle] = useState<string>("");
+  const [creatingBattle, setCreatingBattle] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) return (location.href = "/login");
       const currentUserId = data.user.id;
       setUserId(currentUserId);
+
+      // Fetch username
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", currentUserId)
+        .single();
+
+      if (profile?.username) {
+        setUsername(profile.username);
+      }
+
       await loadProfiles();
       // Load friendships and usernames after userId is set
       const { data: friendsData } = await supabase
@@ -267,11 +292,29 @@ export default function FriendsPage() {
     return profile?.avatar_url || null;
   };
 
-  // Handle challenge to battle (placeholder for future battle functionality)
+  // Handle challenge to battle - opens confirmation dialog
   const handleChallengeToBattle = (friendId: string) => {
-    const friendUsername = getUsernameById(friendId);
-    toast.info(`Challenge to battle feature coming soon! ${friendUsername} will be notified.`);
-    // TODO: Implement battle challenge functionality
+    setSelectedFriendForBattle(friendId);
+    setBattleDialogOpen(true);
+  };
+
+  // Create battle from dialog
+  const handleCreateBattle = async () => {
+    if (!userId || !selectedFriendForBattle) {
+      toast.error("Please select a friend");
+      return;
+    }
+
+    setCreatingBattle(true);
+    const battleId = await createBattle(userId, selectedFriendForBattle);
+    
+    if (battleId) {
+      setBattleDialogOpen(false);
+      setSelectedFriendForBattle("");
+      toast.success("Battle created! Check the battles page to see your progress.");
+    }
+    
+    setCreatingBattle(false);
   };
 
   // Accept a friend invitation
@@ -526,6 +569,34 @@ export default function FriendsPage() {
           )}
         </div>
       </Card>
+
+      {/* Create Battle Dialog */}
+      <Dialog open={battleDialogOpen} onOpenChange={setBattleDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Challenge to Battle</DialogTitle>
+            <DialogDescription>
+              Create a week-long habit battle with {getUsernameById(selectedFriendForBattle)}. The
+              person with the most completed habits wins! The battle will start immediately and last 7 days.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4">
+            <p className="text-sm text-gray-400">
+              Battle name will be auto-generated as "{username || "You"} vs {getUsernameById(selectedFriendForBattle)}"
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBattleDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateBattle} disabled={creatingBattle}>
+              {creatingBattle ? "Creating..." : "Create Battle"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
