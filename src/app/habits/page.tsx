@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { PageLayout, PageHeader, Section } from "@/components/PageLayout";
 import CreateHabitDialog from "./CreateHabitDialog";
 import HabitList from "./HabitList";
 import PerformanceTester from "@/components/PerformanceTester";
+import { Target } from "lucide-react";
 
 export default function HabitsPage() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -23,17 +25,22 @@ export default function HabitsPage() {
 
   if (!userId) return null;
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 p-4 p-8 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border border-gray-700/50 rounded-xl space-y-6 min-h-[calc(100vh-4rem)]">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-white">Your Habits</h1>
-        <CreateHabitDialog userId={userId} tz={tz} />
-      </div>
+    <PageLayout>
+      <PageHeader
+        title="Your Habits"
+        icon={<Target className="h-8 w-8 text-primary" />}
+        actions={<CreateHabitDialog userId={userId} tz={tz} />}
+      />
 
-      <HabitList userId={userId} />
+      <Section>
+        <HabitList userId={userId} />
+      </Section>
 
-      <div className="border-t pt-8">
-        <PerformanceTester />
-      </div>
-    </div>
+      <Section>
+        <div className="border-t border-border pt-8">
+          <PerformanceTester />
+        </div>
+      </Section>
+    </PageLayout>
   );
 }

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import Image from "next/image";
 
@@ -49,10 +49,10 @@ export default function NavBar() {
   }, []);
 
   return (
-    <nav className="w-full border-b border-white/10 bg-gradient-to-r from-gray-900/90 via-red-900/20 to-gray-900/90 backdrop-blur sticky top-0 z-50">
-      <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+    <nav className="w-full border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <Image
             src="/habit-battles-logo.svg"
             alt="Habit Battles Logo"
@@ -60,57 +60,76 @@ export default function NavBar() {
             height={32}
             className="h-8 w-8"
           />
-          <span className="font-semibold text-white hidden sm:block">
+          <span className="font-display font-semibold text-foreground hidden sm:block">
             Habit Battles
           </span>
         </Link>
 
         {/* Mobile Center Title */}
         <div className="md:hidden">
-          <h1 className="font-semibold text-white text-lg">Habit Battles</h1>
+          <h1 className="font-display font-semibold text-foreground text-lg">Habit Battles</h1>
         </div>
 
         {/* Desktop Navigation - Hide on login pages when not authenticated */}
         {isAuthenticated && !pathname?.includes('/login') && (
-          <div className="hidden md:flex items-center">
+          <div className="hidden md:flex items-center gap-1">
           <Link
             href="/habits"
-            className="text-base font-medium text-white opacity-80 hover:opacity-100 transition-opacity px-3 py-2 rounded hover:bg-white/5"
+            className={`font-ui text-sm font-medium px-3 py-2 rounded-md transition-colors ${
+              pathname === "/habits"
+                ? "text-foreground bg-accent"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+            }`}
           >
             Habits
           </Link>
-          <div className="text-gray-500 mx-1">|</div>
           <Link
             href="/calendar"
-            className="text-base font-medium text-white opacity-80 hover:opacity-100 transition-opacity px-3 py-2 rounded hover:bg-white/5"
+            className={`font-ui text-sm font-medium px-3 py-2 rounded-md transition-colors ${
+              pathname === "/calendar"
+                ? "text-foreground bg-accent"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+            }`}
           >
             Calendar
           </Link>
-          <div className="text-gray-500 mx-1">|</div>
           <Link
             href="/battles"
-            className="text-base font-medium text-white opacity-80 hover:opacity-100 transition-opacity px-3 py-2 rounded hover:bg-white/5"
+            className={`font-ui text-sm font-medium px-3 py-2 rounded-md transition-colors ${
+              pathname === "/battles"
+                ? "text-foreground bg-accent"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+            }`}
           >
             Battles
           </Link>
-          <div className="text-gray-500 mx-1">|</div>
           <Link
             href="/leaderboard"
-            className="text-base font-medium text-white opacity-80 hover:opacity-100 transition-opacity px-3 py-2 rounded hover:bg-white/5"
+            className={`font-ui text-sm font-medium px-3 py-2 rounded-md transition-colors ${
+              pathname === "/leaderboard"
+                ? "text-foreground bg-accent"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+            }`}
           >
             Leaderboard
           </Link>
-          <div className="text-gray-500 mx-1">|</div>
           <Link
             href="/friends"
-            className="text-base font-medium text-white opacity-80 hover:opacity-100 transition-opacity px-3 py-2 rounded hover:bg-white/5"
+            className={`font-ui text-sm font-medium px-3 py-2 rounded-md transition-colors ${
+              pathname === "/friends"
+                ? "text-foreground bg-accent"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+            }`}
           >
             Friends
           </Link>
-          <div className="text-gray-500 mx-1">|</div>
           <Link
             href="/profile"
-            className="text-base font-medium text-white opacity-80 hover:opacity-100 transition-opacity px-3 py-2 rounded hover:bg-white/5"
+            className={`font-ui text-sm font-medium px-3 py-2 rounded-md transition-colors ${
+              pathname === "/profile"
+                ? "text-foreground bg-accent"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+            }`}
           >
             Profile
           </Link>
@@ -125,47 +144,74 @@ export default function NavBar() {
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="sm" className="p-2">
-                  <Menu className="h-5 w-5 text-white" />
+                  <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="bg-gray-900 border-gray-700"
+                className="bg-background border-border"
               >
-                <div className="flex flex-col gap-4 mt-8">
+                <SheetHeader>
+                  <SheetTitle>Navigation</SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col gap-2">
                   <Link
                     href="/habits"
-                    className="text-white py-2 px-4 rounded hover:bg-gray-800 transition-colors"
+                    className={`font-ui py-2 px-4 rounded-md transition-colors ${
+                      pathname === "/habits"
+                        ? "text-foreground bg-accent"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    }`}
                   >
                     Habits
                   </Link>
                   <Link
                     href="/calendar"
-                    className="text-white py-2 px-4 rounded hover:bg-gray-800 transition-colors"
+                    className={`font-ui py-2 px-4 rounded-md transition-colors ${
+                      pathname === "/calendar"
+                        ? "text-foreground bg-accent"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    }`}
                   >
                     Calendar
                   </Link>
                   <Link
                     href="/battles"
-                    className="text-white py-2 px-4 rounded hover:bg-gray-800 transition-colors"
+                    className={`font-ui py-2 px-4 rounded-md transition-colors ${
+                      pathname === "/battles"
+                        ? "text-foreground bg-accent"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    }`}
                   >
                     Battles
                   </Link>
                   <Link
                     href="/leaderboard"
-                    className="text-white py-2 px-4 rounded hover:bg-gray-800 transition-colors"
+                    className={`font-ui py-2 px-4 rounded-md transition-colors ${
+                      pathname === "/leaderboard"
+                        ? "text-foreground bg-accent"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    }`}
                   >
                     Leaderboard
                   </Link>
                   <Link
                     href="/friends"
-                    className="text-white py-2 px-4 rounded hover:bg-gray-800 transition-colors"
+                    className={`font-ui py-2 px-4 rounded-md transition-colors ${
+                      pathname === "/friends"
+                        ? "text-foreground bg-accent"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    }`}
                   >
                     Friends
                   </Link>
                   <Link
                     href="/profile"
-                    className="text-white py-2 px-4 rounded hover:bg-gray-800 transition-colors"
+                    className={`font-ui py-2 px-4 rounded-md transition-colors ${
+                      pathname === "/profile"
+                        ? "text-foreground bg-accent"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    }`}
                   >
                     Profile
                   </Link>
@@ -178,17 +224,17 @@ export default function NavBar() {
           {/* User Info */}
           {username ? (
             <>
-              <span className="text-sm hidden lg:block text-white/80">
+              <span className="font-ui text-sm hidden lg:block text-muted-foreground">
                 {username}
               </span>
               <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-red-500/20 text-red-400">
+                <AvatarFallback className="bg-primary/10 text-primary font-display">
                   {username[0]?.toUpperCase() ?? "U"}
                 </AvatarFallback>
               </Avatar>
               <Button
                 size="sm"
-                variant="secondary"
+                variant="ghost"
                 onClick={() =>
                   supabase.auth.signOut().then(() => (location.href = "/"))
                 }

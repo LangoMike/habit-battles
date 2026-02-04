@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
+import { PageLayout, PageHeader, Section } from "@/components/PageLayout";
 import { toast } from "sonner";
-import { Sword, Trophy, Calendar, Users, Plus, Crown } from "lucide-react";
+import { Sword, Trophy, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
@@ -151,8 +153,6 @@ export default function BattlesPage() {
         p_user_id: currentUserId,
       });
 
-      console.log("Battles query:", { battlesData, battlesError, currentUserId });
-
       if (battlesError) {
         console.error("Error fetching battles:", battlesError);
         toast.error("Failed to load battles");
@@ -162,7 +162,6 @@ export default function BattlesPage() {
       }
 
       if (!battlesData || battlesData.length === 0) {
-        console.log("No battles found");
         setBattles([]);
         setLoading(false);
         return;
@@ -263,7 +262,6 @@ export default function BattlesPage() {
         })
       );
 
-      console.log("Battles loaded:", battlesWithScores);
       setBattles(battlesWithScores);
     } catch (error) {
       console.error("Error loading battles:", error);
@@ -339,14 +337,7 @@ export default function BattlesPage() {
   // Check if battle is active
   const isBattleActive = (battle: Battle) => {
     const today = new Date().toISOString().split("T")[0];
-    const isActive = battle.start_date <= today && battle.end_date >= today;
-    console.log(`Battle ${battle.id} active check:`, {
-      start_date: battle.start_date,
-      end_date: battle.end_date,
-      today,
-      isActive
-    });
-    return isActive;
+    return battle.start_date <= today && battle.end_date >= today;
   };
 
   // Check if battle is completed
@@ -377,136 +368,116 @@ export default function BattlesPage() {
     return winnerIds.length > 0 ? winnerIds : null;
   };
 
-  // Format date for display
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  // Get days remaining
-  const getDaysRemaining = (endDate: string) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const end = new Date(endDate);
-    end.setHours(0, 0, 0, 0);
-    const diff = Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    return diff;
-  };
-
   const activeBattles = battles.filter((b) => isBattleActive(b));
   const completedBattles = battles.filter((b) => isBattleCompleted(b));
 
-  // Debug logging
-  console.log("Battles state:", { 
-    totalBattles: battles.length, 
-    activeBattles: activeBattles.length, 
-    completedBattles: completedBattles.length,
-    battles: battles.map(b => ({ id: b.id, name: b.name, start_date: b.start_date, end_date: b.end_date, members: b.members.length }))
-  });
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 p-8 space-y-8 rounded-xl">
+    <PageLayout>
       {/* Welcome Header */}
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-4">
+      <PageHeader
+        title={username ? `${username}, Ready to battle?!` : "Ready to battle?!"}
+        subtitle="Create battles and fight to the top of the leaderboards"
+        icon={
           <Image
             src="/habit-battles-logo.svg"
             alt="Habit Battles Logo"
-            width={64}
-            height={64}
-            className="h-16 w-16"
+            width={48}
+            height={48}
+            className="h-12 w-12"
           />
-          <div className="text-left">
-            <h1 className="text-3xl font-bold text-white">
-              {username ? `${username}, ` : ""}Ready to battle?!
-            </h1>
+        }
+        actions={
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button
+              onClick={() => router.push("/leaderboard")}
+              variant="outline"
+              size="sm"
+            >
+              <Trophy className="h-4 w-4" />
+              Leaderboard
+            </Button>
+            <Button
+              onClick={() => setCreateDialogOpen(true)}
+              size="sm"
+            >
+              <Plus className="h-4 w-4" />
+              Create Battle
+            </Button>
           </div>
-        </div>
-        <p className="text-gray-400">Create battles and fight to the top of the leaderboards.</p>
-      </div>
-
-      {/* Create Battle and Leaderboard Buttons */}
-      <div className="flex justify-center gap-4">
-        <Button
-          onClick={() => setCreateDialogOpen(true)}
-          className="bg-red-600 hover:bg-red-700 text-white"
-          size="lg"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          Create Battle
-        </Button>
-        <Button
-          onClick={() => router.push("/leaderboard")}
-          className="bg-yellow-600 hover:bg-yellow-700 text-white"
-          size="lg"
-        >
-          <Trophy className="h-5 w-5 mr-2" />
-          Leaderboard
-        </Button>
-      </div>
+        }
+      />
 
       {/* Active Battles */}
-      <Card className="p-6 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border-gray-700/50">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Sword className="h-5 w-5 text-red-400" />
-            <h2 className="text-xl font-semibold text-white">Active Battles</h2>
+      <Section
+        title="Active Battles"
+        icon={<Sword className="h-5 w-5" />}
+      >
+        {loading && activeBattles.length === 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Skeleton className="h-48" />
+            <Skeleton className="h-48" />
           </div>
-
-          {loading && activeBattles.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">Loading battles...</div>
-          ) : activeBattles.length === 0 ? (
-            <div className="text-center py-8">
-              <Sword className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-400">No active battles. Create one to get started!</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {activeBattles.map((battle) => (
-                <BattleCard key={battle.id} battle={battle} currentUserId={userId || ""} />
-              ))}
-            </div>
-          )}
-        </div>
-      </Card>
+        ) : activeBattles.length === 0 ? (
+          <Card>
+            <CardContent>
+              <EmptyState
+                icon={Sword}
+                title="No active battles"
+                description="Create a battle to compete with friends and track your progress"
+                action={
+                  <Button onClick={() => setCreateDialogOpen(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Battle
+                  </Button>
+                }
+              />
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {activeBattles.map((battle) => (
+              <BattleCard key={battle.id} battle={battle} currentUserId={userId || ""} />
+            ))}
+          </div>
+        )}
+      </Section>
 
       {/* Completed Battles */}
-      <Card className="p-6 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border-gray-700/50">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Trophy className="h-5 w-5 text-yellow-400" />
-            <h2 className="text-xl font-semibold text-white">Completed Battles</h2>
+      <Section
+        title="Completed Battles"
+        icon={<Trophy className="h-5 w-5" />}
+      >
+        {loading && completedBattles.length === 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Skeleton className="h-48" />
+            <Skeleton className="h-48" />
           </div>
-
-          {loading && completedBattles.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">Loading battles...</div>
-          ) : completedBattles.length === 0 ? (
-            <div className="text-center py-8">
-              <Trophy className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-400">
-                Complete a battle to see your results here! Finish an active battle to view the winner and final scores.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {completedBattles.map((battle) => {
-                const winnerIds = getWinner(battle);
-                return (
-                  <CompletedBattleCard
-                    key={battle.id}
-                    battle={battle}
-                    currentUserId={userId || ""}
-                    winnerIds={winnerIds}
-                  />
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </Card>
+        ) : completedBattles.length === 0 ? (
+          <Card>
+            <CardContent>
+              <EmptyState
+                icon={Trophy}
+                title="No completed battles"
+                description="Complete an active battle to see your results here. Finish a battle to view the winner and final scores."
+              />
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {completedBattles.map((battle) => {
+              const winnerIds = getWinner(battle);
+              return (
+                <CompletedBattleCard
+                  key={battle.id}
+                  battle={battle}
+                  currentUserId={userId || ""}
+                  winnerIds={winnerIds}
+                />
+              );
+            })}
+          </div>
+        )}
+      </Section>
 
       {/* Create Battle Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
@@ -521,20 +492,20 @@ export default function BattlesPage() {
 
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium text-white mb-2 block">Opponent</label>
+              <label className="font-ui text-sm font-medium text-foreground mb-2 block">
+                Opponent
+              </label>
               {friends.length === 0 ? (
-                <div className="text-sm text-gray-400 py-2">
+                <div className="font-ui text-sm text-muted-foreground py-2">
                   No friends available. Add friends first to create a battle.
                 </div>
               ) : (
                 <select
-                  className="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm text-white"
+                  className="w-full h-9 rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm"
                   value={selectedFriendId}
                   onChange={(e) => setSelectedFriendId(e.target.value)}
                 >
-                  <option value="" className="bg-gray-800 text-gray-400">
-                    Select a friend...
-                  </option>
+                  <option value="">Select a friend...</option>
                   {friends.map((friend) => {
                     const friendId =
                       friend.user_id === userId ? friend.friend_id : friend.user_id;
@@ -544,7 +515,7 @@ export default function BattlesPage() {
                       return null; // Skip if profile not loaded yet
                     }
                     return (
-                      <option key={friend.id} value={friendId} className="bg-gray-800 text-white">
+                      <option key={friend.id} value={friendId}>
                         {friendUsername}
                       </option>
                     );
@@ -561,13 +532,13 @@ export default function BattlesPage() {
             <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={createBattle} disabled={loading}>
-              {loading ? "Creating..." : "Create Battle"}
+            <Button onClick={createBattle} loading={loading}>
+              Create Battle
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageLayout>
   );
 }
 

@@ -77,32 +77,32 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
 
   if (currentScore > opponentScoreValue) {
     statusMessage = "You are currently winning! Keep it Up!";
-    statusColor = "text-green-400";
-    scoreColor = "text-green-400";
-    progressBarColor = "bg-green-500";
+    statusColor = "text-success";
+    scoreColor = "text-success";
+    progressBarColor = "bg-success";
   } else if (currentScore === opponentScoreValue) {
     statusMessage = "You are currently tied! Complete more goals to take the lead!";
-    statusColor = "text-yellow-400";
-    scoreColor = "text-yellow-400";
-    progressBarColor = "bg-yellow-500";
+    statusColor = "text-warning";
+    scoreColor = "text-warning";
+    progressBarColor = "bg-warning";
   } else {
     statusMessage = "You are currently losing! Complete more goals to catch up!";
-    statusColor = "text-red-400";
-    scoreColor = "text-red-400";
-    progressBarColor = "bg-red-500";
+    statusColor = "text-primary";
+    scoreColor = "text-primary";
+    progressBarColor = "bg-primary";
   }
 
   return (
     <>
       <Card
-        className="p-4 bg-gray-800/30 rounded-lg border border-gray-700/50 cursor-pointer hover:border-red-500/50 transition-colors"
+        className="p-4 cursor-pointer hover:shadow-md transition-all duration-200 active:scale-[0.98]"
         onClick={() => setDetailDialogOpen(true)}
       >
         {/* Battle name */}
         <div className="text-center mb-4">
-          <h3 className="text-lg font-semibold text-white">{battle.name}</h3>
+          <h3 className="font-display text-lg font-semibold text-foreground">{battle.name}</h3>
           {/* Battle status message */}
-          <p className={`text-sm font-medium mt-2 ${statusColor}`}>
+          <p className={`font-ui text-sm font-medium mt-2 ${statusColor}`}>
             {statusMessage}
           </p>
         </div>
@@ -111,19 +111,19 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
         <div className="flex items-center justify-between mb-4">
           {/* Current User */}
           <div className="flex flex-col items-center flex-1">
-            <Avatar className="h-16 w-16 mb-2 border-2 border-red-500/50">
+            <Avatar className="h-16 w-16 mb-2 border-2 border-primary/50 group-hover:border-primary transition-colors">
               <AvatarImage src={currentUserProfile?.avatar_url || undefined} />
-              <AvatarFallback className="bg-red-500/20 text-red-400 text-xl">
+              <AvatarFallback className="bg-primary/10 text-primary text-xl font-display">
                 {currentUserProfile?.username?.[0]?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
-            <div className="text-white font-medium text-sm text-center">
+            <div className="font-ui text-foreground font-medium text-sm text-center">
               {currentUserProfile?.username || "You"}
             </div>
-            <div className={`${scoreColor} font-bold text-lg mt-1`}>
+            <div className={`${scoreColor} font-display font-bold text-lg mt-1`}>
               {currentUserScore.score}
             </div>
-            <div className="text-xs text-gray-400 mt-1">
+            <div className="font-ui text-xs text-muted-foreground mt-1">
               {currentUserScore.score} / {currentUserScore.totalHabits} goals
             </div>
           </div>
@@ -141,19 +141,19 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
 
           {/* Opponent */}
           <div className="flex flex-col items-center flex-1">
-            <Avatar className="h-16 w-16 mb-2 border-2 border-gray-600">
+            <Avatar className="h-16 w-16 mb-2 border-2 border-border">
               <AvatarImage src={opponentProfile?.avatar_url || undefined} />
-              <AvatarFallback className="bg-gray-600/20 text-gray-400 text-xl">
+              <AvatarFallback className="bg-muted text-muted-foreground text-xl font-display">
                 {opponentProfile?.username?.[0]?.toUpperCase() || "O"}
               </AvatarFallback>
             </Avatar>
-            <div className="text-white font-medium text-sm text-center">
+            <div className="font-ui text-foreground font-medium text-sm text-center">
               {opponentProfile?.username || "Opponent"}
             </div>
-            <div className="text-white font-bold text-lg mt-1">
+            <div className="font-display font-bold text-lg mt-1 text-foreground">
               {opponentScore.score}
             </div>
-            <div className="text-xs text-gray-400 mt-1">
+            <div className="font-ui text-xs text-muted-foreground mt-1">
               {opponentScore.score} / {opponentScore.totalHabits} goals
             </div>
           </div>
@@ -161,15 +161,15 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
 
         {/* Timer */}
         <div className="text-center mb-2">
-          <div className="text-sm text-gray-400">
+          <div className="font-ui text-sm text-muted-foreground">
             {daysRemaining} {daysRemaining === 1 ? "day" : "days"} {hoursRemaining} {hoursRemaining === 1 ? "hour" : "hours"} remaining
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-gray-700/50 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
           <div
-            className={`${progressBarColor} h-full transition-all duration-300`}
+            className={`${progressBarColor} h-full transition-all duration-500 ease-out`}
             style={{ width: `${(1 - progressPercentage) * 100}%` }}
           />
         </div>

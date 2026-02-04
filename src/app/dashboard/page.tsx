@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageLayout, PageHeader, Section } from "@/components/PageLayout";
 import MotivationalQuote from "@/components/MotivationalQuote";
 import StatsCards from "@/components/StatsCards";
 import { getQuotaStats, QuotaStats } from "@/lib/quotaTracker";
@@ -61,153 +64,189 @@ export default function Dashboard() {
     });
   }, []);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 p-8 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border border-gray-700/50 rounded-xl space-y-8 min-h-[calc(100vh-4rem)]">
+    <PageLayout>
       {/* Welcome Header */}
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-4">
+      <PageHeader
+        title={username ? `Welcome, ${username}!` : "Welcome!"}
+        subtitle={APP_SLOGAN}
+        icon={
           <Image
             src="/habit-battles-logo.svg"
             alt="Habit Battles Logo"
-            width={64}
-            height={64}
-            className="h-16 w-16"
+            width={48}
+            height={48}
+            className="h-12 w-12"
           />
-          <div className="text-left">
-            <h1 className="text-3xl font-bold text-white">
-              Welcome{username ? `, ${username}` : ""}!
-            </h1>
-            <p className="text-red-400 font-medium">{APP_SLOGAN}</p>
+        }
+      />
+
+      {/* Loading State */}
+      {loading ? (
+        <div className="space-y-6">
+          <Skeleton className="h-32 w-full" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
           </div>
         </div>
-        <p className="text-gray-400">Ready to dominate your habits today?</p>
-      </div>
+      ) : (
+        <>
+          {/* Motivational Quote */}
+          <MotivationalQuote />
 
-      {/* Motivational Quote */}
-      <MotivationalQuote />
+          {/* Stats Cards */}
+          {stats ? (
+            <StatsCards stats={stats} />
+          ) : (
+            <EmptyState
+              icon={Target}
+              title="No stats yet"
+              description="Start tracking habits to see your progress here"
+            />
+          )}
 
-      {/* Stats Cards */}
-      {stats && <StatsCards stats={stats} />}
+          {/* Streak Display */}
+          {streakData && (
+            <Section
+              title="Your Streaks"
+              icon={<TrendingUp className="h-5 w-5" />}
+            >
+              <Card>
+                <CardContent>
+                  <StreakDisplay streakData={streakData} variant="dashboard" />
+                </CardContent>
+              </Card>
+            </Section>
+          )}
 
-      {/* Streak Display */}
-      {streakData && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-white">Your Streaks</h2>
-          <StreakDisplay streakData={streakData} variant="dashboard" />
-        </div>
-      )}
-
-      {/* App Description */}
-      <Card className="p-6 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border-gray-700/50">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Target className="h-5 w-5 text-red-400" />
-            <h2 className="text-xl font-semibold text-white">
-              About Habit Battles
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium text-white">
-                What is Habit Battles?
-              </h3>
-              <p className="text-gray-300 leading-relaxed">
-                Habit Battles is your personal habit tracking companion designed
-                to help you build consistent routines and compete with friends.
-                Track your daily habits, set weekly targets, and see your
-                progress in beautiful visualizations.
-              </p>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Users className="h-4 w-4" />
-                <span>Compete with friends in weekly battles</span>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium text-white">Key Features</h3>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-gray-300">
-                  <Target className="h-4 w-4 text-red-400" />
-                  <span>Set custom weekly targets for each habit</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-300">
-                  <Calendar className="h-4 w-4 text-red-400" />
-                  <span>Visual calendar tracking with heatmaps</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-300">
-                  <TrendingUp className="h-4 w-4 text-red-400" />
-                  <span>Track progress and celebrate wins</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Quick Actions */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-white">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link href="/habits">
-            <Card className="p-4 bg-gradient-to-br from-red-900/20 to-red-800/20 border-red-500/30 hover:from-red-900/30 hover:to-red-800/30 transition-all duration-300 cursor-pointer">
-              <div className="flex items-center gap-3">
-                <Target className="h-6 w-6 text-red-400" />
-                <div>
-                  <div className="font-medium text-white">Manage Habits</div>
-                  <div className="text-xs text-gray-400">
-                    Create & track habits
+          {/* App Description */}
+          <Section
+            title="About Habit Battles"
+            description="Your personal habit tracking companion"
+            icon={<Target className="h-5 w-5" />}
+          >
+            <Card>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <h3 className="font-display text-lg font-semibold text-foreground">
+                      What is Habit Battles?
+                    </h3>
+                    <p className="font-ui text-sm text-muted-foreground leading-relaxed">
+                      Habit Battles is your personal habit tracking companion
+                      designed to help you build consistent routines and compete
+                      with friends. Track your daily habits, set weekly targets,
+                      and see your progress in beautiful visualizations.
+                    </p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Users className="h-4 w-4" />
+                      <span>Compete with friends in weekly battles</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="font-display text-lg font-semibold text-foreground">
+                      Key Features
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Target className="h-4 w-4 text-primary" />
+                        <span>Set custom weekly targets for each habit</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar className="h-4 w-4 text-primary" />
+                        <span>Visual calendar tracking with heatmaps</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <TrendingUp className="h-4 w-4 text-primary" />
+                        <span>Track progress and celebrate wins</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </CardContent>
             </Card>
-          </Link>
+          </Section>
 
-          <Link href="/calendar">
-            <Card className="p-4 bg-gradient-to-br from-red-900/20 to-red-800/20 border-red-500/30 hover:from-red-900/30 hover:to-red-800/30 transition-all duration-300 cursor-pointer">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-6 w-6 text-red-400" />
-                <div>
-                  <div className="font-medium text-white">View Calendar</div>
-                  <div className="text-xs text-gray-400">See your progress</div>
-                </div>
-              </div>
-            </Card>
-          </Link>
+          {/* Quick Actions */}
+          <Section title="Quick Actions">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Link href="/habits">
+                <Card className="p-4 hover:shadow-md transition-all duration-200 cursor-pointer group">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+                      <Target className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="font-display font-semibold text-foreground">
+                        Manage Habits
+                      </div>
+                      <div className="font-ui text-xs text-muted-foreground">
+                        Create & track habits
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
 
-          <Link href="/friends">
-            <Card className="p-4 bg-gradient-to-br from-red-900/20 to-red-800/20 border-red-500/30 hover:from-red-900/30 hover:to-red-800/30 transition-all duration-300 cursor-pointer">
-              <div className="flex items-center gap-3">
-                <Users className="h-6 w-6 text-red-400" />
-                <div>
-                  <div className="font-medium text-white">Friends</div>
-                  <div className="text-xs text-gray-400">Connect & compete</div>
-                </div>
-              </div>
-            </Card>
-          </Link>
+              <Link href="/calendar">
+                <Card className="p-4 hover:shadow-md transition-all duration-200 cursor-pointer group">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+                      <Calendar className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="font-display font-semibold text-foreground">
+                        View Calendar
+                      </div>
+                      <div className="font-ui text-xs text-muted-foreground">
+                        See your progress
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
 
-          <Link href="/battles">
-            <Card className="p-4 bg-gradient-to-br from-red-900/20 to-red-800/20 border-red-500/30 hover:from-red-900/30 hover:to-red-800/30 transition-all duration-300 cursor-pointer">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="h-6 w-6 text-red-400" />
-                <div>
-                  <div className="font-medium text-white">Battles</div>
-                  <div className="text-xs text-gray-400">Join competitions</div>
-                </div>
-              </div>
-            </Card>
-          </Link>
-        </div>
-      </div>
-    </div>
+              <Link href="/friends">
+                <Card className="p-4 hover:shadow-md transition-all duration-200 cursor-pointer group">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+                      <Users className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="font-display font-semibold text-foreground">
+                        Friends
+                      </div>
+                      <div className="font-ui text-xs text-muted-foreground">
+                        Connect & compete
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+
+              <Link href="/battles">
+                <Card className="p-4 hover:shadow-md transition-all duration-200 cursor-pointer group">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+                      <TrendingUp className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="font-display font-semibold text-foreground">
+                        Battles
+                      </div>
+                      <div className="font-ui text-xs text-muted-foreground">
+                        Join competitions
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            </div>
+          </Section>
+        </>
+      )}
+    </PageLayout>
   );
 }

@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageLayout, PageHeader, Section } from "@/components/PageLayout";
 import { toast } from "sonner";
 import { Search, UserPlus, Users, Check, X, Sword } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -396,179 +398,175 @@ export default function FriendsPage() {
   const acceptedFriends = friends.filter((f) => f.status === "accepted");
 
   return (
-    <div className="space-y-6">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-white">Friends</h1>
-        <p className="text-gray-400">
-          Connect with friends and compete in habit battles
-        </p>
-      </div>
+    <PageLayout>
+      <PageHeader
+        title="Friends"
+        subtitle="Connect with friends and compete in habit battles"
+        icon={<Users className="h-8 w-8 text-primary" />}
+      />
 
-      <Card className="p-6 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border-gray-700/50">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <UserPlus className="h-5 w-5 text-red-400" />
-            <h2 className="text-xl font-semibold text-white">Add Friends</h2>
-          </div>
-
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search by username..."
-                value={usernameToInvite}
-                onChange={(e) => setUsernameToInvite(e.target.value)}
-                className="pl-10"
-              />
+      <Section
+        title="Add Friends"
+        icon={<UserPlus className="h-5 w-5" />}
+      >
+        <Card>
+          <CardContent>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  placeholder="Search by username..."
+                  value={usernameToInvite}
+                  onChange={(e) => setUsernameToInvite(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && usernameToInvite.trim() && !loading) {
+                      invite();
+                    }
+                  }}
+                  className="pl-10"
+                />
+              </div>
+              <Button
+                onClick={invite}
+                disabled={!usernameToInvite.trim() || loading}
+                loading={loading}
+              >
+                Invite
+              </Button>
             </div>
-            <Button
-              onClick={invite}
-              disabled={!usernameToInvite.trim() || loading}
-            >
-              {loading ? "Sending..." : "Invite"}
-            </Button>
-          </div>
-        </div>
-      </Card>
+          </CardContent>
+        </Card>
+      </Section>
 
       {/* Your Invitations Section */}
-      <Card className="p-6 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border-gray-700/50">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Users className="h-5 w-5 text-red-400" />
-            <h2 className="text-xl font-semibold text-white">
-              Your Invitations
-            </h2>
-          </div>
-
+      <Section
+        title="Your Invitations"
+        icon={<Users className="h-5 w-5" />}
+      >
+        {pendingInvitations.length === 0 ? (
+          <Card>
+            <CardContent>
+              <EmptyState
+                icon={Users}
+                title="No pending invitations"
+                description="Invite friends or wait for incoming invitations"
+              />
+            </CardContent>
+          </Card>
+        ) : (
           <div className="space-y-3">
             {pendingInvitations.map((f) => {
-              const isIncoming = f.friend_id === userId; // Someone invited you
-              const isOutgoing = f.user_id === userId; // You invited someone
+              const isIncoming = f.friend_id === userId;
+              const isOutgoing = f.user_id === userId;
 
               return (
-                <div
-                  key={f.id}
-                  className="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg border border-gray-700/50"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center">
-                      <Users className="h-4 w-4 text-red-400" />
+                <Card key={f.id} className="hover:shadow-md transition-shadow">
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                          <Users className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="font-ui text-sm font-medium text-foreground">
+                            {isOutgoing
+                              ? `You → ${getUsernameById(f.friend_id)}`
+                              : `${getUsernameById(f.user_id)} → You`}
+                          </div>
+                          <div className="font-ui text-xs text-muted-foreground">
+                            {isOutgoing
+                              ? "Pending invitation"
+                              : "Incoming invitation"}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {isIncoming ? (
+                          <>
+                            <Button
+                              size="sm"
+                              onClick={() => acceptInvitation(f)}
+                              variant="default"
+                            >
+                              <Check className="h-4 w-4 mr-1" />
+                              Accept
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => declineInvitation(f)}
+                            >
+                              <X className="h-4 w-4 mr-1" />
+                              Decline
+                            </Button>
+                          </>
+                        ) : (
+                          <div className="font-ui text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
+                            pending
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-sm font-medium text-white">
-                        {isOutgoing
-                          ? `You → ${getUsernameById(f.friend_id)}`
-                          : `${getUsernameById(f.user_id)} → You`}
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        {isOutgoing
-                          ? "Pending invitation"
-                          : "Incoming invitation"}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {isIncoming ? (
-                      <>
-                        <Button
-                          size="sm"
-                          onClick={() => acceptInvitation(f)}
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          <Check className="h-4 w-4 mr-1" />
-                          Accept
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => declineInvitation(f)}
-                          className="border-red-500/50 text-red-400 hover:bg-red-500/10"
-                        >
-                          <X className="h-4 w-4 mr-1" />
-                          Decline
-                        </Button>
-                      </>
-                    ) : (
-                      <div className="text-xs px-2 py-1 rounded bg-yellow-500/20 text-yellow-400">
-                        pending
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               );
             })}
-            {pendingInvitations.length === 0 && (
-              <div className="text-center py-8">
-                <Users className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400">
-                  No pending invitations
-                </p>
-              </div>
-            )}
           </div>
-        </div>
-      </Card>
+        )}
+      </Section>
 
       {/* Friends List Section */}
-      <Card className="p-6 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border-gray-700/50">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Users className="h-5 w-5 text-green-400" />
-            <h2 className="text-xl font-semibold text-white">
-              Friends List
-            </h2>
-          </div>
-
+      <Section
+        title="Friends List"
+        icon={<Users className="h-5 w-5" />}
+      >
+        {acceptedFriends.length === 0 ? (
+          <Card>
+            <CardContent>
+              <EmptyState
+                icon={Users}
+                title="No friends yet"
+                description="Accept an invitation to get started"
+              />
+            </CardContent>
+          </Card>
+        ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {acceptedFriends.map((f) => {
-              // Get the friend's ID (the one that's not the current user)
               const friendId = f.user_id === userId ? f.friend_id : f.user_id;
               const friendUsername = getUsernameById(friendId);
               const friendAvatar = getAvatarById(friendId);
 
               return (
-                <div
+                <Card
                   key={f.id}
-                  className="flex flex-col items-center p-4 bg-gray-800/30 rounded-lg border border-gray-700/50 aspect-square"
+                  className="flex flex-col items-center p-4 hover:shadow-md transition-all duration-200 group"
                 >
-                  {/* Circular Profile Picture */}
-                  <Avatar className="h-20 w-20 mb-3">
+                  <Avatar className="h-16 w-16 mb-3 group-hover:scale-105 transition-transform">
                     <AvatarImage src={friendAvatar || undefined} />
-                    <AvatarFallback className="bg-green-500/20 text-green-400 text-2xl">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xl font-display">
                       {friendUsername?.[0]?.toUpperCase() || "F"}
                     </AvatarFallback>
                   </Avatar>
 
-                  {/* Username */}
-                  <div className="text-sm font-medium text-white text-center mb-3 truncate w-full">
+                  <div className="font-ui text-sm font-medium text-foreground text-center mb-3 truncate w-full">
                     {friendUsername}
                   </div>
 
-                  {/* Challenge to Battle Button */}
                   <Button
                     size="sm"
                     onClick={() => handleChallengeToBattle(friendId)}
-                    className="w-full bg-red-600 hover:bg-red-700 text-white"
+                    className="w-full"
                   >
                     <Sword className="h-4 w-4 mr-1" />
                     Challenge
                   </Button>
-                </div>
+                </Card>
               );
             })}
           </div>
-
-          {acceptedFriends.length === 0 && (
-            <div className="text-center py-8">
-              <Users className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-400">
-                No friends yet. Accept an invitation to get started!
-              </p>
-            </div>
-          )}
-        </div>
-      </Card>
+        )}
+      </Section>
 
       {/* Create Battle Dialog */}
       <Dialog open={battleDialogOpen} onOpenChange={setBattleDialogOpen}>
@@ -591,12 +589,12 @@ export default function FriendsPage() {
             <Button variant="outline" onClick={() => setBattleDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleCreateBattle} disabled={creatingBattle}>
-              {creatingBattle ? "Creating..." : "Create Battle"}
+            <Button onClick={handleCreateBattle} loading={creatingBattle}>
+              Create Battle
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageLayout>
   );
 }

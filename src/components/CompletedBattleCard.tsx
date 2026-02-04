@@ -52,11 +52,13 @@ const CompletedBattleCard = ({ battle, currentUserId, winnerIds }: CompletedBatt
   };
 
   return (
-    <Card className="p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
+    <Card className="p-4">
       {/* Battle name */}
       <div className="text-center mb-4">
-        <h3 className="text-lg font-semibold text-white">{battle.name}</h3>
-        <div className="text-sm text-gray-400 mt-1">
+        <h3 className="font-display text-lg font-semibold text-foreground">
+          {battle.name}
+        </h3>
+        <div className="font-ui text-sm text-muted-foreground mt-1">
           {formatDate(battle.start_date)} - {formatDate(battle.end_date)}
         </div>
       </div>
@@ -69,37 +71,40 @@ const CompletedBattleCard = ({ battle, currentUserId, winnerIds }: CompletedBatt
             <Avatar
               className={`h-16 w-16 mb-2 border-2 ${
                 isCurrentUserWinner
-                  ? "border-green-500/50"
-                  : "border-red-500/50"
+                  ? "border-success/50"
+                  : "border-primary/50"
               }`}
             >
               <AvatarImage src={currentUserProfile?.avatar_url || undefined} />
               <AvatarFallback
                 className={`${
                   isCurrentUserWinner
-                    ? "bg-green-500/20 text-green-400"
-                    : "bg-red-500/20 text-red-400"
-                } text-xl`}
+                    ? "bg-success/10 text-success"
+                    : "bg-primary/10 text-primary"
+                } text-xl font-display`}
               >
                 {currentUserProfile?.username?.[0]?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
             {/* Green tint overlay for winner */}
             {isCurrentUserWinner && (
-              <div className="absolute inset-0 rounded-full bg-green-500/20 pointer-events-none" style={{ borderRadius: '50%' }} />
+              <div
+                className="absolute inset-0 rounded-full bg-success/20 pointer-events-none"
+                style={{ borderRadius: "50%" }}
+              />
             )}
           </div>
           <div
-            className={`font-medium text-sm text-center ${
-              isCurrentUserWinner ? "text-green-400" : "text-red-400"
+            className={`font-ui font-medium text-sm text-center ${
+              isCurrentUserWinner ? "text-success" : "text-primary"
             }`}
           >
             {currentUserProfile?.username || "You"}
           </div>
-          <div className="text-white font-bold text-lg mt-1">
+          <div className="font-display font-bold text-lg mt-1 text-foreground">
             {currentUserScore.score}
           </div>
-          <div className="text-xs text-gray-400 mt-1">
+          <div className="font-ui text-xs text-muted-foreground mt-1">
             {currentUserScore.score} / {currentUserScore.totalHabits} goals
           </div>
         </div>
@@ -121,37 +126,40 @@ const CompletedBattleCard = ({ battle, currentUserId, winnerIds }: CompletedBatt
             <Avatar
               className={`h-16 w-16 mb-2 border-2 ${
                 isOpponentWinner
-                  ? "border-green-500/50"
-                  : "border-red-500/50"
+                  ? "border-success/50"
+                  : "border-primary/50"
               }`}
             >
               <AvatarImage src={opponentProfile?.avatar_url || undefined} />
               <AvatarFallback
                 className={`${
                   isOpponentWinner
-                    ? "bg-green-500/20 text-green-400"
-                    : "bg-red-500/20 text-red-400"
-                } text-xl`}
+                    ? "bg-success/10 text-success"
+                    : "bg-primary/10 text-primary"
+                } text-xl font-display`}
               >
                 {opponentProfile?.username?.[0]?.toUpperCase() || "O"}
               </AvatarFallback>
             </Avatar>
             {/* Green tint overlay for winner */}
             {isOpponentWinner && (
-              <div className="absolute inset-0 rounded-full bg-green-500/20 pointer-events-none" style={{ borderRadius: '50%' }} />
+              <div
+                className="absolute inset-0 rounded-full bg-success/20 pointer-events-none"
+                style={{ borderRadius: "50%" }}
+              />
             )}
           </div>
           <div
-            className={`font-medium text-sm text-center ${
-              isOpponentWinner ? "text-green-400" : "text-red-400"
+            className={`font-ui font-medium text-sm text-center ${
+              isOpponentWinner ? "text-success" : "text-primary"
             }`}
           >
             {opponentProfile?.username || "Opponent"}
           </div>
-          <div className="text-white font-bold text-lg mt-1">
+          <div className="font-display font-bold text-lg mt-1 text-foreground">
             {opponentScore.score}
           </div>
-          <div className="text-xs text-gray-400 mt-1">
+          <div className="font-ui text-xs text-muted-foreground mt-1">
             {opponentScore.score} / {opponentScore.totalHabits} goals
           </div>
         </div>

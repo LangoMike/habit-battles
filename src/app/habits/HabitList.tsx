@@ -183,21 +183,27 @@ export default function HabitList({ userId }: { userId: string }) {
 
   return (
     <div className="grid gap-3">
-      {loading && <p className="text-sm opacity-70">Loading…</p>}
+      {loading && (
+        <p className="font-ui text-sm text-muted-foreground">Loading…</p>
+      )}
       {habits.map((h) => (
         <div
           key={h.id}
-          className="border rounded-xl p-4 flex items-center justify-between gap-4"
+          className="border border-border rounded-xl p-4 flex items-center justify-between gap-4 bg-card"
         >
           <div className="min-w-0">
-            <div className="font-medium truncate">{h.name}</div>
-            <div className="text-xs opacity-70">
+            <div className="font-ui font-medium truncate text-foreground">
+              {h.name}
+            </div>
+            <div className="font-ui text-xs text-muted-foreground">
               {h.doneThisWeek} / {h.target_per_week} this week
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {h.doneToday ? (
-              <span className="text-sm"> Today</span>
+              <span className="font-ui text-sm text-muted-foreground">
+                Today
+              </span>
             ) : (
               <Button size="sm" onClick={() => checkIn(h.id)}>
                 Check in
@@ -222,7 +228,7 @@ export default function HabitList({ userId }: { userId: string }) {
         </div>
       ))}
       {!loading && habits.length === 0 && (
-        <p className="opacity-70">
+        <p className="font-ui text-muted-foreground">
           No habits yet… Create your first habit to start tracking!
         </p>
       )}

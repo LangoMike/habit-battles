@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Sparkles } from "lucide-react";
 
 type QuoteData = {
@@ -57,6 +59,10 @@ export default function MotivationalQuote() {
     fetchQuote();
   }, []);
 
+  /**
+   * Fetches a motivational quote from the API or falls back to local quotes
+   * Handles network errors, timeouts, and API failures gracefully
+   */
   const fetchQuote = async () => {
     try {
       setLoading(true);
@@ -65,7 +71,13 @@ export default function MotivationalQuote() {
 
       const response = await fetch(
         "https://api.quotable.io/quotes/random?tags=motivation|success|inspiration&maxLength=150",
-        { signal: controller.signal }
+        { 
+          signal: controller.signal,
+          // Add headers to help with CORS if needed
+          headers: {
+            'Accept': 'application/json',
+          },
+        }
       );
 
       clearTimeout(timeoutId);
@@ -77,8 +89,14 @@ export default function MotivationalQuote() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
-      console.error("Error fetching quote:", error);
-      // Use a random fallback quote
+      // Handle different types of errors silently - fallback quotes will be used
+      if (error instanceof Error) {
+        // Only log unexpected errors, not network failures or aborts
+        if (error.name !== 'AbortError' && !error.message.includes('fetch')) {
+          console.warn("Quote API unavailable, using fallback:", error.message);
+        }
+      }
+      // Use a random fallback quote when API fails
       const randomIndex = Math.floor(Math.random() * fallbackQuotes.length);
       setQuote(fallbackQuotes[randomIndex]);
     } finally {
@@ -91,54 +109,50 @@ export default function MotivationalQuote() {
     setQuote(fallbackQuotes[randomIndex]);
   };
 
-  if (loading) {
-    return (
-      <Card className="p-6 bg-gradient-to-r from-red-900/20 to-red-800/20 border-red-500/30">
-        <div className="flex items-center gap-3 mb-3">
-          <Sparkles className="h-5 w-5 text-red-400" />
-          <Badge variant="outline" className="border-red-500/50 text-red-400">
-            Daily Motivation
-          </Badge>
-        </div>
-        <div className="animate-pulse">
-          <div className="h-4 bg-red-500/20 rounded mb-2"></div>
-          <div className="h-4 bg-red-500/20 rounded w-3/4"></div>
-        </div>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="p-6 bg-gradient-to-r from-red-900/20 to-red-800/20 border-red-500/30 hover:from-red-900/30 hover:to-red-800/30 transition-all duration-300">
-      <div className="flex items-center gap-3 mb-4">
-        <Sparkles className="h-5 w-5 text-red-400" />
-        <Badge variant="outline" className="border-red-500/50 text-red-400">
-          Daily Motivation
-        </Badge>
-      </div>
-
-      {quote && (
-        <div className="space-y-3">
-          <blockquote className="text-lg font-medium text-white/90 leading-relaxed">
-            &quot;{quote.content}&quot;
-          </blockquote>
-          <div className="flex items-center justify-between">
-            <cite className="text-sm text-red-300 not-italic">
-              — {quote.author}
-            </cite>
-            <button
-              onClick={
-                quote._id.startsWith("fallback")
-                  ? getRandomFallbackQuote
-                  : fetchQuote
-              }
-              className="text-xs text-red-400 hover:text-red-300 transition-colors"
-            >
-              New Quote
-            </button>
+    <Card>
+      <CardContent>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-primary/10 text-primary">
+            <Sparkles className="h-5 w-5" />
           </div>
+          <Badge variant="outline">Daily Motivation</Badge>
         </div>
-      )}
+
+        {loading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-3/4" />
+            <div className="flex items-center justify-between mt-4">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          </div>
+        ) : quote ? (
+          <div className="space-y-4">
+            <blockquote className="font-ui text-base sm:text-lg font-medium text-foreground leading-relaxed">
+              &quot;{quote.content}&quot;
+            </blockquote>
+            <div className="flex items-center justify-between">
+              <cite className="font-ui text-sm text-muted-foreground not-italic">
+                — {quote.author}
+              </cite>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={
+                  quote._id.startsWith("fallback")
+                    ? getRandomFallbackQuote
+                    : fetchQuote
+                }
+                className="text-xs"
+              >
+                New Quote
+              </Button>
+            </div>
+          </div>
+        ) : null}
+      </CardContent>
     </Card>
   );
 }

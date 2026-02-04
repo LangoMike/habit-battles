@@ -43,11 +43,11 @@ export default function PerformanceTester() {
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
+      <CardHeader className="text-center pt-8">
         <CardTitle className="text-center">
           Performance Metrics Tester
         </CardTitle>
-        <p className="text-sm text-center text-gray-600">
+        <p className="font-ui text-sm text-center text-muted-foreground mt-2">
           Test real-time write → UI refresh performance during habit check-ins
         </p>
       </CardHeader>

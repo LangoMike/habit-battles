@@ -55,33 +55,33 @@ const BattleDetailDialog = ({
   const opponentScoreValue = opponentScore.score;
   
   let statusColors = {
-    bg: "bg-red-500/10",
-    border: "border-red-500/30",
-    avatarBorder: "border-red-500/50",
-    avatarBg: "bg-red-500/20",
-    avatarText: "text-red-400",
-    scoreText: "text-red-400",
+    bg: "bg-primary/10",
+    border: "border-primary/30",
+    avatarBorder: "border-primary/50",
+    avatarBg: "bg-primary/10",
+    avatarText: "text-primary",
+    scoreText: "text-primary",
   };
 
   if (currentScore > opponentScoreValue) {
     // Winning - green
     statusColors = {
-      bg: "bg-green-500/10",
-      border: "border-green-500/30",
-      avatarBorder: "border-green-500/50",
-      avatarBg: "bg-green-500/20",
-      avatarText: "text-green-400",
-      scoreText: "text-green-400",
+      bg: "bg-success/10",
+      border: "border-success/30",
+      avatarBorder: "border-success/50",
+      avatarBg: "bg-success/10",
+      avatarText: "text-success",
+      scoreText: "text-success",
     };
   } else if (currentScore === opponentScoreValue) {
     // Tied - yellow
     statusColors = {
-      bg: "bg-yellow-500/10",
-      border: "border-yellow-500/30",
-      avatarBorder: "border-yellow-500/50",
-      avatarBg: "bg-yellow-500/20",
-      avatarText: "text-yellow-400",
-      scoreText: "text-yellow-400",
+      bg: "bg-warning/10",
+      border: "border-warning/30",
+      avatarBorder: "border-warning/50",
+      avatarBg: "bg-warning/10",
+      avatarText: "text-warning",
+      scoreText: "text-warning",
     };
   }
   // else: losing - red (default)
@@ -120,10 +120,10 @@ const BattleDetailDialog = ({
                 </AvatarFallback>
               </Avatar>
               <div>
-                <div className="text-white font-semibold text-lg">
+                <div className="font-ui font-semibold text-lg text-foreground">
                   {currentUserProfile?.username || "You"}
                 </div>
-                <div className={`${statusColors.scoreText} font-bold`}>
+                <div className={`font-display ${statusColors.scoreText} font-bold`}>
                   Score: {currentUserScore.score} / {currentUserScore.totalHabits}
                 </div>
               </div>
@@ -131,25 +131,29 @@ const BattleDetailDialog = ({
 
             <div className="space-y-2">
               {currentUserScore.habitProgress.length === 0 ? (
-                <div className="text-gray-400 text-sm">No habits tracked</div>
+                <div className="font-ui text-sm text-muted-foreground">
+                  No habits tracked
+                </div>
               ) : (
                 currentUserScore.habitProgress.map((habit) => (
                   <div
                     key={habit.habitId}
-                    className="flex items-center justify-between p-2 bg-gray-800/50 rounded"
+                    className="flex items-center justify-between p-2 bg-muted rounded"
                   >
                     <div className="flex items-center gap-2 flex-1">
                       {habit.isMet ? (
-                        <Check className="h-5 w-5 text-green-400" />
+                        <Check className="h-5 w-5 text-success" />
                       ) : (
-                        <X className="h-5 w-5 text-gray-500" />
+                        <X className="h-5 w-5 text-muted-foreground" />
                       )}
-                      <span className="text-white text-sm">{habit.habitName}</span>
+                      <span className="font-ui text-sm text-foreground">
+                        {habit.habitName}
+                      </span>
                     </div>
-                    <div className="text-gray-400 text-sm">
+                    <div className="font-ui text-sm text-muted-foreground">
                       {habit.completed} / {habit.target}
                       {habit.isMet && (
-                        <span className="ml-2 text-green-400">✓ Goal met!</span>
+                        <span className="ml-2 text-success">✓ Goal met!</span>
                       )}
                     </div>
                   </div>
@@ -159,19 +163,19 @@ const BattleDetailDialog = ({
           </div>
 
           {/* Opponent Section */}
-          <div className="p-4 bg-gray-800/30 border border-gray-700/50 rounded-lg">
+          <div className="p-4 bg-muted/50 border border-border rounded-lg">
             <div className="flex items-center gap-3 mb-4">
-              <Avatar className="h-12 w-12 border-2 border-gray-600">
+              <Avatar className="h-12 w-12 border-2 border-border">
                 <AvatarImage src={opponentProfile?.avatar_url || undefined} />
-                <AvatarFallback className="bg-gray-600/20 text-gray-400">
+                <AvatarFallback className="bg-muted text-muted-foreground font-display">
                   {opponentProfile?.username?.[0]?.toUpperCase() || "O"}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <div className="text-white font-semibold text-lg">
+                <div className="font-ui font-semibold text-lg text-foreground">
                   {opponentProfile?.username || "Opponent"}
                 </div>
-                <div className="text-white font-bold">
+                <div className="font-display font-bold text-foreground">
                   Score: {opponentScore.score} / {opponentScore.totalHabits}
                 </div>
               </div>
@@ -179,10 +183,13 @@ const BattleDetailDialog = ({
 
             <div className="space-y-2">
               {opponentScore.totalHabits === 0 ? (
-                <div className="text-gray-400 text-sm">No habits tracked</div>
+                <div className="font-ui text-sm text-muted-foreground">
+                  No habits tracked
+                </div>
               ) : (
-                <div className="text-gray-400 text-sm">
-                  {opponentScore.score} of {opponentScore.totalHabits} goals completed
+                <div className="font-ui text-sm text-muted-foreground">
+                  {opponentScore.score} of {opponentScore.totalHabits} goals
+                  completed
                 </div>
               )}
             </div>

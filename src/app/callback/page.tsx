@@ -14,7 +14,6 @@ function CallbackContent() {
   const [retryCount, setRetryCount] = useState(0);
 
   const handleAuthSuccess = useCallback(() => {
-    console.log("Authentication successful, redirecting to dashboard");
     setStatus("success");
     // Use Next.js router instead of window.location for better mobile compatibility
     router.push("/dashboard");
@@ -29,7 +28,6 @@ function CallbackContent() {
   }, []);
 
   const retryAuth = () => {
-    console.log("Retrying authentication...");
     setStatus("loading");
     setRetryCount((prev) => prev + 1);
 
@@ -42,27 +40,14 @@ function CallbackContent() {
   useEffect(() => {
     const code = params.get("code");
 
-    console.log("🔍 Callback page loaded with params:", {
-      code: code ? "present" : "missing",
-      hash: window.location.hash,
-      userAgent: navigator.userAgent,
-      retryCount,
-    });
-
     // Newer magic-link flow: /callback?code=...
     if (code) {
-      console.log(" Processing magic link with code...");
-
       supabase.auth
         .exchangeCodeForSession(code)
         .then(({ data, error }) => {
           if (error) {
             handleAuthError(error);
           } else if (data.session) {
-            console.log(
-              " Session created successfully:",
-              data.session.user?.email
-            );
             handleAuthSuccess();
           } else {
             handleAuthError(new Error("No session created"));
@@ -79,18 +64,12 @@ function CallbackContent() {
       typeof window !== "undefined" &&
       window.location.hash.includes("access_token")
     ) {
-      console.log("🔗 Processing hash-based auth token...");
-
       // Give Supabase a moment to process the hash
       setTimeout(() => {
         supabase.auth.getSession().then(({ data, error }) => {
           if (error) {
             handleAuthError(error);
           } else if (data.session) {
-            console.log(
-              " Hash-based session found:",
-              data.session.user?.email
-            );
             handleAuthSuccess();
           } else {
             handleAuthError(
@@ -103,7 +82,6 @@ function CallbackContent() {
     }
 
     // No auth parameters found
-    console.log(" No authentication parameters found, redirecting to login");
     setTimeout(() => {
       router.push("/login");
     }, 2000);

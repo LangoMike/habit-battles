@@ -21,11 +21,11 @@ export default function StreakDisplay({
   // Get appropriate fire icon based on streak length
   const getFireIcon = (streak: number) => {
     if (streak < 3) {
-      return <Zap className="h-5 w-5 text-yellow-400" />;
+      return <Zap className="h-5 w-5 text-warning" />;
     } else if (streak < 10) {
-      return <Flame className="h-5 w-5 text-orange-500" />;
+      return <Flame className="h-5 w-5 text-primary" />;
     } else {
-      return <FlameKindling className="h-5 w-5 text-red-600" />;
+      return <FlameKindling className="h-5 w-5 text-primary" />;
     }
   };
 
@@ -94,10 +94,12 @@ export default function StreakDisplay({
 
   if (dailyStreak === 0 && weeklyStreak === 0) {
     return (
-      <Card className="p-3 bg-gradient-to-r from-gray-800/30 to-gray-700/30 border-gray-600/50">
+      <Card className="p-3 bg-muted/50">
         <div className="flex items-center gap-2">
-          <Zap className="h-4 w-4 text-gray-400" />
-          <div className="text-sm text-gray-400">Start your streak today!</div>
+          <Zap className="h-4 w-4 text-muted-foreground" />
+          <div className="font-ui text-sm text-muted-foreground">
+            Start your streak today!
+          </div>
         </div>
       </Card>
     );
@@ -106,23 +108,20 @@ export default function StreakDisplay({
   return (
     <div className="space-y-3">
       {/* Daily Streak */}
-      <Card className="p-4 bg-gradient-to-r from-red-900/20 to-red-800/20 border-red-500/30">
+      <Card className="p-4 bg-gradient-to-r from-red-600/15 to-red-700/15 dark:from-red-900/20 dark:to-red-800/20 border-primary/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {getFireIcon(dailyStreak)}
             <div>
-              <div className="text-sm font-medium text-white">
+              <div className="font-ui text-sm font-medium text-foreground">
                 {dailyStreak} day{dailyStreak !== 1 ? "s" : ""} in a row
               </div>
-              <div className="text-xs text-red-300">
+              <div className="font-ui text-xs text-primary">
                 {getStreakMessage(dailyStreak, "daily")}
               </div>
             </div>
           </div>
-          <Badge
-            variant="outline"
-            className="border-red-500/50 text-red-400 text-xs"
-          >
+          <Badge variant="outline" className="text-xs">
             Daily
           </Badge>
         </div>
@@ -130,23 +129,20 @@ export default function StreakDisplay({
 
       {/* Weekly Streak */}
       {showWeekly && weeklyStreak > 0 && (
-        <Card className="p-4 bg-gradient-to-r from-orange-900/20 to-orange-800/20 border-orange-500/30">
+        <Card className="p-4 bg-gradient-to-r from-orange-600/15 to-orange-700/15 dark:from-orange-900/20 dark:to-orange-800/20 border-warning/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {getFireIcon(weeklyStreak)}
               <div>
-                <div className="text-sm font-medium text-white">
+                <div className="font-ui text-sm font-medium text-foreground">
                   {weeklyStreak} week{weeklyStreak !== 1 ? "s" : ""} in a row
                 </div>
-                <div className="text-xs text-orange-300">
+                <div className="font-ui text-xs text-warning">
                   {getStreakMessage(weeklyStreak, "weekly")}
                 </div>
               </div>
             </div>
-            <Badge
-              variant="outline"
-              className="border-orange-500/50 text-orange-400 text-xs"
-            >
+            <Badge variant="outline" className="text-xs">
               Weekly
             </Badge>
           </div>
