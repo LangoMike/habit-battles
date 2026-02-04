@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { Sword } from "lucide-react";
+import Image from "next/image";
 import { BattleWithMembers } from "@/app/battles/page";
 import BattleDetailDialog from "./BattleDetailDialog";
 
@@ -99,13 +99,16 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
             </div>
           </div>
 
-           {/* Crossed Swords */}
-           <div className="flex items-center justify-center mx-4">
-             <div className="relative w-12 h-12 flex items-center justify-center">
-               <Sword className="h-12 w-12 text-red-400" />
-               <Sword className="h-12 w-12 text-red-400 rotate-90 absolute top-0 left-0" />
-             </div>
-           </div>
+          {/* Crossed Swords */}
+          <div className="flex items-center justify-center mx-4">
+            <Image
+              src="/Crossing swords.svg"
+              alt="Crossed swords"
+              width={96}
+              height={64}
+              className="h-16 w-24 object-contain"
+            />
+          </div>
 
           {/* Opponent */}
           <div className="flex flex-col items-center flex-1">
