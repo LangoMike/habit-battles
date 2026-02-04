@@ -72,16 +72,24 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
   const opponentScoreValue = opponentScore.score;
   let statusMessage = "";
   let statusColor = "";
+  let scoreColor = "";
+  let progressBarColor = "";
 
   if (currentScore > opponentScoreValue) {
     statusMessage = "You are currently winning! Keep it Up!";
     statusColor = "text-green-400";
+    scoreColor = "text-green-400";
+    progressBarColor = "bg-green-500";
   } else if (currentScore === opponentScoreValue) {
     statusMessage = "You are currently tied! Complete more goals to take the lead!";
     statusColor = "text-yellow-400";
+    scoreColor = "text-yellow-400";
+    progressBarColor = "bg-yellow-500";
   } else {
     statusMessage = "You are currently losing! Complete more goals to catch up!";
     statusColor = "text-red-400";
+    scoreColor = "text-red-400";
+    progressBarColor = "bg-red-500";
   }
 
   return (
@@ -112,7 +120,7 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
             <div className="text-white font-medium text-sm text-center">
               {currentUserProfile?.username || "You"}
             </div>
-            <div className="text-red-400 font-bold text-lg mt-1">
+            <div className={`${scoreColor} font-bold text-lg mt-1`}>
               {currentUserScore.score}
             </div>
             <div className="text-xs text-gray-400 mt-1">
@@ -161,7 +169,7 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
         {/* Progress Bar */}
         <div className="w-full bg-gray-700/50 rounded-full h-2 overflow-hidden">
           <div
-            className="bg-red-500 h-full transition-all duration-300"
+            className={`${progressBarColor} h-full transition-all duration-300`}
             style={{ width: `${(1 - progressPercentage) * 100}%` }}
           />
         </div>

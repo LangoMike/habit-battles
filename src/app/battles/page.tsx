@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Sword, Trophy, Calendar, Users, Plus, Crown } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import {
@@ -20,6 +21,7 @@ import {
 import { calculateBattleScore, BattleScore } from "@/lib/battleScore";
 import { createBattle as createBattleUtil } from "@/lib/battleUtils";
 import BattleCard from "@/components/BattleCard";
+import CompletedBattleCard from "@/components/CompletedBattleCard";
 
 // Battle data types
 type Battle = {
@@ -52,6 +54,7 @@ type Friend = {
 };
 
 export default function BattlesPage() {
+  const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [battles, setBattles] = useState<BattleWithMembers[]>([]);
@@ -425,8 +428,8 @@ export default function BattlesPage() {
         <p className="text-gray-400">Create battles and fight to the top of the leaderboards.</p>
       </div>
 
-      {/* Create Battle Button */}
-      <div className="flex justify-center">
+      {/* Create Battle and Leaderboard Buttons */}
+      <div className="flex justify-center gap-4">
         <Button
           onClick={() => setCreateDialogOpen(true)}
           className="bg-red-600 hover:bg-red-700 text-white"
@@ -434,6 +437,14 @@ export default function BattlesPage() {
         >
           <Plus className="h-5 w-5 mr-2" />
           Create Battle
+        </Button>
+        <Button
+          onClick={() => router.push("/leaderboard")}
+          className="bg-yellow-600 hover:bg-yellow-700 text-white"
+          size="lg"
+        >
+          <Trophy className="h-5 w-5 mr-2" />
+          Leaderboard
         </Button>
       </div>
 
@@ -463,114 +474,39 @@ export default function BattlesPage() {
       </Card>
 
       {/* Completed Battles */}
-      {completedBattles.length > 0 && (
-        <Card className="p-6 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border-gray-700/50">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Trophy className="h-5 w-5 text-yellow-400" />
-              <h2 className="text-xl font-semibold text-white">Completed Battles</h2>
-            </div>
+      <Card className="p-6 bg-gradient-to-r from-gray-900/50 to-gray-800/50 border-gray-700/50">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Trophy className="h-5 w-5 text-yellow-400" />
+            <h2 className="text-xl font-semibold text-white">Completed Battles</h2>
+          </div>
 
-            <div className="space-y-4">
+          {loading && completedBattles.length === 0 ? (
+            <div className="text-center py-8 text-gray-400">Loading battles...</div>
+          ) : completedBattles.length === 0 ? (
+            <div className="text-center py-8">
+              <Trophy className="h-12 w-12 text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-400">
+                Complete a battle to see your results here! Finish an active battle to view the winner and final scores.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {completedBattles.map((battle) => {
                 const winnerIds = getWinner(battle);
-                const sortedMembers = [...battle.members].sort((a, b) => {
-                  const scoreA = battle.scores[a.user_id]?.score || 0;
-                  const scoreB = battle.scores[b.user_id]?.score || 0;
-                  return scoreB - scoreA;
-                });
-
                 return (
-                  <div
+                  <CompletedBattleCard
                     key={battle.id}
-                    className="p-4 bg-gray-800/30 rounded-lg border border-gray-700/50"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-white">{battle.name}</h3>
-                        <div className="text-sm text-gray-400 mt-1">
-                          {formatDate(battle.start_date)} - {formatDate(battle.end_date)}
-                        </div>
-                      </div>
-                      {winnerIds && winnerIds.length > 0 && (
-                        <div className="flex items-center gap-2 text-yellow-400">
-                          <Crown className="h-5 w-5" />
-                          <span className="font-semibold">
-                            {winnerIds.length === 1
-                              ? battle.memberProfiles[winnerIds[0]]?.username || "Winner"
-                              : "Tie!"}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Final Leaderboard */}
-                    <div className="space-y-2">
-                      {sortedMembers.map((member, index) => {
-                        const score = battle.scores[member.user_id] || {
-                          score: 0,
-                          totalHabits: 0,
-                          habitProgress: [],
-                        };
-                        const profile = battle.memberProfiles[member.user_id];
-                        const isWinner = winnerIds ? winnerIds.includes(member.user_id) : false;
-                        const isCurrentUser = member.user_id === userId;
-
-                        return (
-                          <div
-                            key={member.user_id}
-                            className={`flex items-center justify-between p-3 rounded-lg ${
-                              isWinner
-                                ? "bg-yellow-500/20 border border-yellow-500/50"
-                                : isCurrentUser
-                                  ? "bg-gray-700/30"
-                                  : "bg-gray-700/20"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-600 text-white font-bold">
-                                {index === 0 ? (
-                                  <Crown className="h-5 w-5 text-yellow-400" />
-                                ) : (
-                                  index + 1
-                                )}
-                              </div>
-                              <Avatar className="h-8 w-8">
-                                <AvatarImage src={profile?.avatar_url || undefined} />
-                                <AvatarFallback className="bg-yellow-500/20 text-yellow-400 text-sm">
-                                  {profile?.username?.[0]?.toUpperCase() || "U"}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <div className="text-white font-medium">
-                                  {profile?.username || member.user_id}
-                                  {isCurrentUser && (
-                                    <span className="ml-2 text-xs text-gray-400">(You)</span>
-                                  )}
-                                  {isWinner && (
-                                    <span className="ml-2 text-xs text-yellow-400">(Winner)</span>
-                                  )}
-                                </div>
-                                <div className="text-xs text-gray-400">
-                                  {score.score} / {score.totalHabits} goals completed
-                                </div>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-xl font-bold text-white">{score.score}</div>
-                              <div className="text-xs text-gray-400">points</div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                    battle={battle}
+                    currentUserId={userId || ""}
+                    winnerIds={winnerIds}
+                  />
                 );
               })}
             </div>
-          </div>
-        </Card>
-      )}
+          )}
+        </div>
+      </Card>
 
       {/* Create Battle Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>

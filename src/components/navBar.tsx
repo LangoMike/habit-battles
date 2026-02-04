@@ -95,6 +95,13 @@ export default function NavBar() {
           </Link>
           <div className="text-gray-500 mx-1">|</div>
           <Link
+            href="/leaderboard"
+            className="text-base font-medium text-white opacity-80 hover:opacity-100 transition-opacity px-3 py-2 rounded hover:bg-white/5"
+          >
+            Leaderboard
+          </Link>
+          <div className="text-gray-500 mx-1">|</div>
+          <Link
             href="/friends"
             className="text-base font-medium text-white opacity-80 hover:opacity-100 transition-opacity px-3 py-2 rounded hover:bg-white/5"
           >
@@ -143,6 +150,12 @@ export default function NavBar() {
                     className="text-white py-2 px-4 rounded hover:bg-gray-800 transition-colors"
                   >
                     Battles
+                  </Link>
+                  <Link
+                    href="/leaderboard"
+                    className="text-white py-2 px-4 rounded hover:bg-gray-800 transition-colors"
+                  >
+                    Leaderboard
                   </Link>
                   <Link
                     href="/friends"
