@@ -399,7 +399,7 @@ export default function BattlesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 p-8 space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 p-8 space-y-8 rounded-xl">
       {/* Welcome Header */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-4">
