@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { calculateBattleScore, BattleScore } from "@/lib/battleScore";
 import { createBattle as createBattleUtil } from "@/lib/battleUtils";
+import BattleCard from "@/components/BattleCard";
 
 // Battle data types
 type Battle = {
@@ -37,7 +38,7 @@ type BattleMember = {
 };
 
 // Battle with members data - battles are 1v1, so members array contains exactly 2 users (current user + friend)
-type BattleWithMembers = Battle & {
+export type BattleWithMembers = Battle & {
   members: BattleMember[]; // Always exactly 2 members for 1v1 battles
   scores: Record<string, BattleScore>;
   memberProfiles: Record<string, { username: string; avatar_url: string | null }>;
@@ -142,43 +143,71 @@ export default function BattlesPage() {
   const loadBattles = useCallback(async (currentUserId: string) => {
     setLoading(true);
     try {
-      // Get all battles where user is a member
-      const { data: memberBattles } = await supabase
-        .from("battle_members")
-        .select("battle_id")
-        .eq("user_id", currentUserId);
+      // Get all battles where user is a member using database function (bypasses RLS)
+      const { data: battlesData, error: battlesError } = await supabase.rpc("get_user_battles", {
+        p_user_id: currentUserId,
+      });
 
-      if (!memberBattles || memberBattles.length === 0) {
+      console.log("Battles query:", { battlesData, battlesError, currentUserId });
+
+      if (battlesError) {
+        console.error("Error fetching battles:", battlesError);
+        toast.error("Failed to load battles");
         setBattles([]);
         setLoading(false);
         return;
       }
 
-      const battleIds = memberBattles.map((m) => m.battle_id);
-
-      // Get battle details
-      const { data: battlesData } = await supabase
-        .from("battles")
-        .select("*")
-        .in("id", battleIds)
-        .order("created_at", { ascending: false });
-
-      if (!battlesData) {
+      if (!battlesData || battlesData.length === 0) {
+        console.log("No battles found");
         setBattles([]);
         setLoading(false);
         return;
       }
 
-      // Get all members for these battles
-      const { data: allMembers } = await supabase
-        .from("battle_members")
-        .select("*")
-        .in("battle_id", battleIds);
+      // Transform the function result to match Battle type
+      type BattleResult = {
+        battle_id: string;
+        battle_name: string;
+        owner_id: string;
+        start_date: string;
+        end_date: string;
+        created_at: string;
+      };
+      
+      const battleIds = (battlesData as BattleResult[]).map((b) => b.battle_id);
+      const transformedBattles: Battle[] = (battlesData as BattleResult[]).map((b) => ({
+        id: b.battle_id,
+        name: b.battle_name,
+        owner_id: b.owner_id,
+        start_date: b.start_date,
+        end_date: b.end_date,
+        created_at: b.created_at,
+      }));
+
+      // Get all members for these battles using database function (bypasses RLS)
+      const { data: allMembersData, error: membersError } = await supabase.rpc("get_battle_members", {
+        p_battle_ids: battleIds,
+      });
+
+      if (membersError) {
+        console.error("Error fetching battle members:", membersError);
+        toast.error("Failed to load battle members");
+        setBattles([]);
+        setLoading(false);
+        return;
+      }
+
+      const allMembers: BattleMember[] = (allMembersData || []).map((m: any) => ({
+        battle_id: m.battle_id,
+        user_id: m.user_id,
+        joined_at: m.joined_at,
+      }));
 
       // Get all user IDs from members
       const userIds = new Set<string>();
-      battlesData.forEach((b) => userIds.add(b.owner_id));
-      allMembers?.forEach((m) => userIds.add(m.user_id));
+      transformedBattles.forEach((b) => userIds.add(b.owner_id));
+      allMembers.forEach((m) => userIds.add(m.user_id));
 
       // Get profiles for all users
       const profileMap: Record<string, { username: string; avatar_url: string | null }> = {};
@@ -206,8 +235,8 @@ export default function BattlesPage() {
 
       // Calculate scores for each battle
       const battlesWithScores = await Promise.all(
-        battlesData.map(async (battle) => {
-          const members = allMembers?.filter((m) => m.battle_id === battle.id) || [];
+        transformedBattles.map(async (battle) => {
+          const members = allMembers.filter((m) => m.battle_id === battle.id);
           const scores: Record<string, BattleScore> = {};
 
           // Calculate score for each member
@@ -229,6 +258,7 @@ export default function BattlesPage() {
         })
       );
 
+      console.log("Battles loaded:", battlesWithScores);
       setBattles(battlesWithScores);
     } catch (error) {
       console.error("Error loading battles:", error);
@@ -237,6 +267,42 @@ export default function BattlesPage() {
       setLoading(false);
     }
   }, []);
+
+  // Set up real-time subscription for battle updates
+  useEffect(() => {
+    if (!userId) return;
+
+    const battlesChannel = supabase
+      .channel("battles-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "battle_members",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          if (userId) loadBattles(userId);
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "battles",
+        },
+        () => {
+          if (userId) loadBattles(userId);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(battlesChannel);
+    };
+  }, [userId, loadBattles]);
 
   // Create a new battle
   const createBattle = async () => {
@@ -251,7 +317,10 @@ export default function BattlesPage() {
     if (battleId) {
       setCreateDialogOpen(false);
       setSelectedFriendId("");
-      await loadBattles(userId);
+      // Wait a moment for database to sync, then reload
+      setTimeout(async () => {
+        await loadBattles(userId);
+      }, 500);
     }
     
     setLoading(false);
@@ -265,7 +334,14 @@ export default function BattlesPage() {
   // Check if battle is active
   const isBattleActive = (battle: Battle) => {
     const today = new Date().toISOString().split("T")[0];
-    return battle.start_date <= today && battle.end_date >= today;
+    const isActive = battle.start_date <= today && battle.end_date >= today;
+    console.log(`Battle ${battle.id} active check:`, {
+      start_date: battle.start_date,
+      end_date: battle.end_date,
+      today,
+      isActive
+    });
+    return isActive;
   };
 
   // Check if battle is completed
@@ -313,6 +389,14 @@ export default function BattlesPage() {
 
   const activeBattles = battles.filter((b) => isBattleActive(b));
   const completedBattles = battles.filter((b) => isBattleCompleted(b));
+
+  // Debug logging
+  console.log("Battles state:", { 
+    totalBattles: battles.length, 
+    activeBattles: activeBattles.length, 
+    completedBattles: completedBattles.length,
+    battles: battles.map(b => ({ id: b.id, name: b.name, start_date: b.start_date, end_date: b.end_date, members: b.members.length }))
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 p-8 space-y-8">
@@ -363,93 +447,10 @@ export default function BattlesPage() {
               <p className="text-gray-400">No active battles. Create one to get started!</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {activeBattles.map((battle) => {
-                const daysRemaining = getDaysRemaining(battle.end_date);
-                const sortedMembers = [...battle.members].sort((a, b) => {
-                  const scoreA = battle.scores[a.user_id]?.score || 0;
-                  const scoreB = battle.scores[b.user_id]?.score || 0;
-                  return scoreB - scoreA;
-                });
-
-                return (
-                  <div
-                    key={battle.id}
-                    className="p-4 bg-gray-800/30 rounded-lg border border-gray-700/50"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-white">{battle.name}</h3>
-                        <div className="flex items-center gap-4 text-sm text-gray-400 mt-1">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            {formatDate(battle.start_date)} - {formatDate(battle.end_date)}
-                          </div>
-                          <div className="text-red-400 font-medium">
-                            {daysRemaining} {daysRemaining === 1 ? "day" : "days"} remaining
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Leaderboard */}
-                    <div className="space-y-2">
-                      {sortedMembers.map((member, index) => {
-                        const score = battle.scores[member.user_id] || {
-                          score: 0,
-                          totalHabits: 0,
-                          habitProgress: [],
-                        };
-                        const profile = battle.memberProfiles[member.user_id];
-                        const isCurrentUser = member.user_id === userId;
-
-                        return (
-                          <div
-                            key={member.user_id}
-                            className={`flex items-center justify-between p-3 rounded-lg ${
-                              isCurrentUser
-                                ? "bg-red-500/20 border border-red-500/50"
-                                : "bg-gray-700/30"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-600 text-white font-bold">
-                                {index === 0 ? (
-                                  <Crown className="h-5 w-5 text-yellow-400" />
-                                ) : (
-                                  index + 1
-                                )}
-                              </div>
-                              <Avatar className="h-8 w-8">
-                                <AvatarImage src={profile?.avatar_url || undefined} />
-                                <AvatarFallback className="bg-red-500/20 text-red-400 text-sm">
-                                  {profile?.username?.[0]?.toUpperCase() || "U"}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <div className="text-white font-medium">
-                                  {profile?.username || member.user_id}
-                                  {isCurrentUser && (
-                                    <span className="ml-2 text-xs text-red-400">(You)</span>
-                                  )}
-                                </div>
-                                <div className="text-xs text-gray-400">
-                                  {score.habitProgress.filter((h) => h.isMet).length} /{" "}
-                                  {score.totalHabits} habits completed
-                                </div>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-xl font-bold text-white">{score.score}</div>
-                              <div className="text-xs text-gray-400">points</div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {activeBattles.map((battle) => (
+                <BattleCard key={battle.id} battle={battle} currentUserId={userId || ""} />
+              ))}
             </div>
           )}
         </div>
