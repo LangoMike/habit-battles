@@ -67,6 +67,23 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
   const battleDuration = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
   const progressPercentage = Math.max(0, Math.min(1, timeRemaining / battleDuration));
 
+  // Determine battle status
+  const currentScore = currentUserScore.score;
+  const opponentScoreValue = opponentScore.score;
+  let statusMessage = "";
+  let statusColor = "";
+
+  if (currentScore > opponentScoreValue) {
+    statusMessage = "You are currently winning! Keep it Up!";
+    statusColor = "text-green-400";
+  } else if (currentScore === opponentScoreValue) {
+    statusMessage = "You are currently tied! Complete more goals to take the lead!";
+    statusColor = "text-yellow-400";
+  } else {
+    statusMessage = "You are currently losing! Complete more goals to catch up!";
+    statusColor = "text-red-400";
+  }
+
   return (
     <>
       <Card
@@ -76,6 +93,10 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
         {/* Battle name */}
         <div className="text-center mb-4">
           <h3 className="text-lg font-semibold text-white">{battle.name}</h3>
+          {/* Battle status message */}
+          <p className={`text-sm font-medium mt-2 ${statusColor}`}>
+            {statusMessage}
+          </p>
         </div>
 
         {/* Two users side by side with crossed swords */}
@@ -95,7 +116,7 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
               {currentUserScore.score}
             </div>
             <div className="text-xs text-gray-400 mt-1">
-              {currentUserScore.habitProgress.filter((h) => h.isMet).length} / {currentUserScore.totalHabits} goals
+              {currentUserScore.score} / {currentUserScore.totalHabits} goals
             </div>
           </div>
 
@@ -125,7 +146,7 @@ const BattleCard = ({ battle, currentUserId }: BattleCardProps) => {
               {opponentScore.score}
             </div>
             <div className="text-xs text-gray-400 mt-1">
-              {opponentScore.habitProgress.filter((h) => h.isMet).length} / {opponentScore.totalHabits} goals
+              {opponentScore.score} / {opponentScore.totalHabits} goals
             </div>
           </div>
         </div>

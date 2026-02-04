@@ -241,10 +241,12 @@ export default function BattlesPage() {
 
           // Calculate score for each member
           for (const member of members) {
+            const isCurrentUser = member.user_id === currentUserId;
             const score = await calculateBattleScore(
               member.user_id,
               battle.start_date,
-              battle.end_date
+              battle.end_date,
+              isCurrentUser
             );
             scores[member.user_id] = score;
           }
@@ -350,22 +352,26 @@ export default function BattlesPage() {
     return battle.end_date < today;
   };
 
-  // Get winner of completed battle
-  const getWinner = (battle: BattleWithMembers) => {
+  // Get winners of completed battle (returns array to handle ties)
+  const getWinner = (battle: BattleWithMembers): string[] | null => {
     if (!isBattleCompleted(battle)) return null;
 
     let maxScore = -1;
-    let winnerId: string | null = null;
+    const winnerIds: string[] = [];
 
     battle.members.forEach((member) => {
       const score = battle.scores[member.user_id]?.score || 0;
       if (score > maxScore) {
         maxScore = score;
-        winnerId = member.user_id;
+        winnerIds.length = 0; // Clear previous winners
+        winnerIds.push(member.user_id);
+      } else if (score === maxScore && maxScore >= 0) {
+        // Tie: add to winners array
+        winnerIds.push(member.user_id);
       }
     });
 
-    return winnerId;
+    return winnerIds.length > 0 ? winnerIds : null;
   };
 
   // Format date for display
@@ -467,7 +473,7 @@ export default function BattlesPage() {
 
             <div className="space-y-4">
               {completedBattles.map((battle) => {
-                const winnerId = getWinner(battle);
+                const winnerIds = getWinner(battle);
                 const sortedMembers = [...battle.members].sort((a, b) => {
                   const scoreA = battle.scores[a.user_id]?.score || 0;
                   const scoreB = battle.scores[b.user_id]?.score || 0;
@@ -486,11 +492,13 @@ export default function BattlesPage() {
                           {formatDate(battle.start_date)} - {formatDate(battle.end_date)}
                         </div>
                       </div>
-                      {winnerId && (
+                      {winnerIds && winnerIds.length > 0 && (
                         <div className="flex items-center gap-2 text-yellow-400">
                           <Crown className="h-5 w-5" />
                           <span className="font-semibold">
-                            {battle.memberProfiles[winnerId]?.username || "Winner"}
+                            {winnerIds.length === 1
+                              ? battle.memberProfiles[winnerIds[0]]?.username || "Winner"
+                              : "Tie!"}
                           </span>
                         </div>
                       )}
@@ -505,7 +513,7 @@ export default function BattlesPage() {
                           habitProgress: [],
                         };
                         const profile = battle.memberProfiles[member.user_id];
-                        const isWinner = member.user_id === winnerId;
+                        const isWinner = winnerIds ? winnerIds.includes(member.user_id) : false;
                         const isCurrentUser = member.user_id === userId;
 
                         return (
@@ -544,8 +552,7 @@ export default function BattlesPage() {
                                   )}
                                 </div>
                                 <div className="text-xs text-gray-400">
-                                  {score.habitProgress.filter((h) => h.isMet).length} /{" "}
-                                  {score.totalHabits} habits completed
+                                  {score.score} / {score.totalHabits} goals completed
                                 </div>
                               </div>
                             </div>

@@ -50,6 +50,42 @@ const BattleDetailDialog = ({
   const currentUserProfile = battle.memberProfiles[currentUserId];
   const opponentProfile = battle.memberProfiles[opponentMember.user_id];
 
+  // Determine battle status for dynamic coloring
+  const currentScore = currentUserScore.score;
+  const opponentScoreValue = opponentScore.score;
+  
+  let statusColors = {
+    bg: "bg-red-500/10",
+    border: "border-red-500/30",
+    avatarBorder: "border-red-500/50",
+    avatarBg: "bg-red-500/20",
+    avatarText: "text-red-400",
+    scoreText: "text-red-400",
+  };
+
+  if (currentScore > opponentScoreValue) {
+    // Winning - green
+    statusColors = {
+      bg: "bg-green-500/10",
+      border: "border-green-500/30",
+      avatarBorder: "border-green-500/50",
+      avatarBg: "bg-green-500/20",
+      avatarText: "text-green-400",
+      scoreText: "text-green-400",
+    };
+  } else if (currentScore === opponentScoreValue) {
+    // Tied - yellow
+    statusColors = {
+      bg: "bg-yellow-500/10",
+      border: "border-yellow-500/30",
+      avatarBorder: "border-yellow-500/50",
+      avatarBg: "bg-yellow-500/20",
+      avatarText: "text-yellow-400",
+      scoreText: "text-yellow-400",
+    };
+  }
+  // else: losing - red (default)
+
   // Get all unique habits from both users
   const allHabitIds = new Set<string>();
   currentUserScore.habitProgress.forEach((h) => allHabitIds.add(h.habitId));
@@ -75,11 +111,11 @@ const BattleDetailDialog = ({
 
         <div className="space-y-6 mt-4">
           {/* Current User Section */}
-          <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+          <div className={`p-4 ${statusColors.bg} border ${statusColors.border} rounded-lg`}>
             <div className="flex items-center gap-3 mb-4">
-              <Avatar className="h-12 w-12 border-2 border-red-500/50">
+              <Avatar className={`h-12 w-12 border-2 ${statusColors.avatarBorder}`}>
                 <AvatarImage src={currentUserProfile?.avatar_url || undefined} />
-                <AvatarFallback className="bg-red-500/20 text-red-400">
+                <AvatarFallback className={`${statusColors.avatarBg} ${statusColors.avatarText}`}>
                   {currentUserProfile?.username?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
@@ -87,7 +123,7 @@ const BattleDetailDialog = ({
                 <div className="text-white font-semibold text-lg">
                   {currentUserProfile?.username || "You"}
                 </div>
-                <div className="text-red-400 font-bold">
+                <div className={`${statusColors.scoreText} font-bold`}>
                   Score: {currentUserScore.score} / {currentUserScore.totalHabits}
                 </div>
               </div>
@@ -142,30 +178,12 @@ const BattleDetailDialog = ({
             </div>
 
             <div className="space-y-2">
-              {opponentScore.habitProgress.length === 0 ? (
+              {opponentScore.totalHabits === 0 ? (
                 <div className="text-gray-400 text-sm">No habits tracked</div>
               ) : (
-                opponentScore.habitProgress.map((habit) => (
-                  <div
-                    key={habit.habitId}
-                    className="flex items-center justify-between p-2 bg-gray-800/50 rounded"
-                  >
-                    <div className="flex items-center gap-2 flex-1">
-                      {habit.isMet ? (
-                        <Check className="h-5 w-5 text-green-400" />
-                      ) : (
-                        <X className="h-5 w-5 text-gray-500" />
-                      )}
-                      <span className="text-white text-sm">{habit.habitName}</span>
-                    </div>
-                    <div className="text-gray-400 text-sm">
-                      {habit.completed} / {habit.target}
-                      {habit.isMet && (
-                        <span className="ml-2 text-green-400">✓ Goal met!</span>
-                      )}
-                    </div>
-                  </div>
-                ))
+                <div className="text-gray-400 text-sm">
+                  {opponentScore.score} of {opponentScore.totalHabits} goals completed
+                </div>
               )}
             </div>
           </div>

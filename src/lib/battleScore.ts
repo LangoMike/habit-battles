@@ -6,7 +6,8 @@ import { supabase } from './supabaseClient';
  * @param userId - The user's ID
  * @param startDate - Battle start date (ISO string)
  * @param endDate - Battle end date (ISO string)
- * @returns Battle score and detailed progress
+ * @param isCurrentUser - Whether this is the current user (shows full details) or opponent (summary only)
+ * @returns Battle score and detailed progress (or summary for opponents)
  */
 export type BattleScore = {
   score: number;
@@ -20,11 +21,51 @@ export type BattleScore = {
   }>;
 };
 
-export async function calculateBattleScore(
+/**
+ * Calculate battle score summary for opponents (bypasses RLS)
+ * Only returns total habits and completed goals count, no detailed habit information
+ */
+async function calculateBattleScoreSummary(
   userId: string,
   startDate: string,
   endDate: string
 ): Promise<BattleScore> {
+  const { data, error } = await supabase.rpc('get_battle_score_summary', {
+    p_user_id: userId,
+    p_start_date: startDate,
+    p_end_date: endDate,
+  });
+
+  if (error) {
+    console.error('Error fetching battle score summary:', error);
+    return {
+      score: 0,
+      totalHabits: 0,
+      habitProgress: [],
+    };
+  }
+
+  const result = Array.isArray(data) && data.length > 0 ? data[0] : { total_habits: 0, completed_goals: 0 };
+
+  return {
+    score: result.completed_goals || 0,
+    totalHabits: result.total_habits || 0,
+    habitProgress: [], // No detailed progress for opponents
+  };
+}
+
+export async function calculateBattleScore(
+  userId: string,
+  startDate: string,
+  endDate: string,
+  isCurrentUser: boolean = false
+): Promise<BattleScore> {
+  // For opponents, use the RPC function to bypass RLS and get summary only
+  if (!isCurrentUser) {
+    return calculateBattleScoreSummary(userId, startDate, endDate);
+  }
+
+  // For current user, get full details
   // Get all user's habits
   const { data: habits, error: habitsError } = await supabase
     .from('habits')
