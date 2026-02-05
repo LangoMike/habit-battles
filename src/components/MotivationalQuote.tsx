@@ -14,6 +14,12 @@ type QuoteData = {
   tags: string[];
 };
 
+// ZenQuotes API response format - simple structure with just quote and author
+type ZenQuoteResponse = {
+  q: string; // quote text
+  a: string; // author name
+};
+
 // Local fallback quotes in case the API is unavailable
 const fallbackQuotes: QuoteData[] = [
   {
@@ -60,41 +66,50 @@ export default function MotivationalQuote() {
   }, []);
 
   /**
-   * Fetches a motivational quote from the API or falls back to local quotes
+   * Fetches a motivational quote from zenquotes.io via Next.js API route
+   * Uses server-side fetch to bypass CORS restrictions
    * Handles network errors, timeouts, and API failures gracefully
    */
   const fetchQuote = async () => {
     try {
       setLoading(true);
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
 
-      const response = await fetch(
-        "https://api.quotable.io/quotes/random?tags=motivation|success|inspiration&maxLength=150",
-        { 
-          signal: controller.signal,
-          // Add headers to help with CORS if needed
-          headers: {
-            'Accept': 'application/json',
-          },
-        }
-      );
+      // Fetch quote via Next.js API route (server-side, no CORS issues)
+      const response = await fetch("/api/quote", {
+        signal: controller.signal,
+      });
 
       clearTimeout(timeoutId);
 
-      if (response.ok) {
-        const data = await response.json();
-        setQuote(data[0]);
-      } else {
+      if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      // Parse response from our API route
+      const data = await response.json();
+
+      // Extract quote and author from response
+      if (data && data.quote && data.author) {
+        setQuote({
+          _id: `zenquote-${Date.now()}`,
+          content: data.quote,
+          author: data.author,
+          tags: ["motivation"],
+        });
+        return; // Success - exit early
+      }
+
+      // If we get here, response format was unexpected
+      throw new Error("Invalid response format from API");
     } catch (error) {
-      // Handle different types of errors silently - fallback quotes will be used
-      if (error instanceof Error) {
-        // Only log unexpected errors, not network failures or aborts
-        if (error.name !== 'AbortError' && !error.message.includes('fetch')) {
-          console.warn("Quote API unavailable, using fallback:", error.message);
-        }
+      // Don't log AbortError (timeout) as it's expected behavior
+      if (error instanceof Error && error.name === "AbortError") {
+        // Timeout occurred - silently fall back to local quotes
+      } else if (error instanceof Error) {
+        // Log other errors for debugging
+        console.warn("Error fetching quote:", error.message);
       }
       // Use a random fallback quote when API fails
       const randomIndex = Math.floor(Math.random() * fallbackQuotes.length);
